@@ -1,0 +1,163 @@
+/* Reset nhẹ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+/* Khung chung */
+.oe-container {
+    width: 960px;
+    margin: 20px auto;
+    background: #fff;
+    border: 1px solid #ccc;
+}
+
+/* Header */
+.oe-header {
+    background: #ff9933;
+    padding: 15px 20px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.oe-logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Menu ngang */
+.oe-menu {
+    background: #333;
+}
+
+.oe-menu ul {
+    list-style: none;
+    display: flex;
+}
+
+.oe-menu li a {
+    display: block;
+    padding: 10px 15px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.oe-menu li a:hover {
+    background: #ff9933;
+}
+
+/* Nội dung chính + sidebar (layout khách hàng) */
+.oe-content-wrapper {
+    display: flex;
+    padding: 15px 20px 20px;
+}
+
+.oe-main {
+    flex: 3;
+    margin-right: 20px;
+}
+
+.oe-sidebar {
+    flex: 1;
+}
+
+/* Footer */
+.oe-footer {
+    background: #eee;
+    padding: 10px 20px;
+    font-size: 12px;
+    text-align: center;
+    border-top: 1px solid #ccc;
+}
+
+/* Layout admin */
+.admin-header {
+    background: #006699;
+    color: #fff;
+    padding: 15px 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.admin-menu {
+    background: #004466;
+}
+
+.admin-menu ul {
+    list-style: none;
+    display: flex;
+}
+
+.admin-menu li a {
+    display: block;
+    padding: 10px 15px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.admin-menu li a:hover {
+    background: #0099cc;
+}
+
+.admin-content {
+    padding: 15px 20px 20px;
+}
+/* DETAIL PAGE */
+.detail-video-box iframe {
+    width: 100%;
+    height: 380px;
+    margin-bottom: 10px;
+    border: 1px solid #f1a15f;
+}
+
+.detail-info {
+    padding: 10px 0;
+}
+
+.detail-actions {
+    margin: 15px 0;
+}
+
+.recent-item {
+    display: flex;
+    border: 1px solid #9ccc65;
+    margin: 6px 0;
+}
+
+.recent-thumb {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid #9ccc65;
+}
+
+.recent-thumb img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.recent-info {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.recent-info a {
+    text-decoration: none;
+    font-weight: bold;
+    color: #333;
+}
+
+.recent-info a:hover {
+    text-decoration: underline;
+}
