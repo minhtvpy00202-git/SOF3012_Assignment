@@ -216,3 +216,128 @@ main {
     border: 1px solid #ebccd1;
 }
 
+/* ===== Reports tabs - styled like design (angled corners, orange accent) ===== */
+
+.reports-tabs {
+  border: 1px solid #e6e0d9;
+  background: #fff;
+  padding: 0;
+  border-radius: 6px;
+  overflow: visible;
+  margin-bottom: 20px;
+}
+
+/* hide the radios */
+.reports-tabs input[type="radio"] { display: none; }
+
+/* tab labels container */
+.reports-tabs .tabs-labels {
+  display: flex;
+  gap: 0;
+  padding: 0 10px;
+  margin: 0;
+  background: transparent;
+}
+
+/* each tab label */
+.reports-tabs .tabs-labels label {
+  position: relative;
+  display: inline-block;
+  padding: 10px 20px;
+  margin-right: 6px;
+  cursor: pointer;
+  font-weight: 700;
+  color: #b84a00;          /* dark orange text */
+  background: linear-gradient(#fff, #fff);
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  box-shadow: none;
+  transition: all .15s ease;
+  z-index: 2;
+}
+
+/* small angled corner effect using :before */
+.reports-tabs .tabs-labels label:before {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 0;
+  width: 12px;
+  height: 12px;
+  background: transparent;
+  transform: skewX(-25deg);
+  border-top: 1px solid transparent;
+  border-right: 1px solid transparent;
+}
+
+/* default inactive label style (light border) */
+.reports-tabs .tabs-labels label {
+  border: 1px solid #e6e0d9;
+  background: #faf6f2;
+  color: #b84a00;
+}
+
+/* active label style when radio checked */
+.reports-tabs input#tab1:checked ~ .tabs-labels label[for="tab1"],
+.reports-tabs input#tab2:checked ~ .tabs-labels label[for="tab2"],
+.reports-tabs input#tab3:checked ~ .tabs-labels label[for="tab3"] {
+  background: #fff;
+  color: #b84a00;
+  border-color: #e27a2f;        /* orange border for active */
+  box-shadow: 0 -2px 0 rgba(226,122,47,0.06) inset;
+}
+
+/* emphasize active tab text color slightly darker */
+.reports-tabs input#tab1:checked ~ .tabs-labels label[for="tab1"],
+.reports-tabs input#tab2:checked ~ .tabs-labels label[for="tab2"],
+.reports-tabs input#tab3:checked ~ .tabs-labels label[for="tab3"] {
+  font-weight: 800;
+}
+
+/* Panel area - placed below labels, with top border that matches active tab */
+.reports-tabs .tab-content {
+  padding: 16px;
+  border-top: 2px solid #e27a2f; /* orange line across top of content to match style */
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+  margin-top: -2px; /* pull up to visually connect with active tab */
+}
+
+/* hide all panels; show only active via :checked */
+.reports-tabs .panel { display: none; }
+.reports-tabs input#tab1:checked ~ .tab-content #panel1,
+.reports-tabs input#tab2:checked ~ .tab-content #panel2,
+.reports-tabs input#tab3:checked ~ .tab-content #panel3 {
+  display: block;
+}
+
+/* tweak table inside tab for visual spacing */
+.reports-tabs .admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.reports-tabs .admin-table th,
+.reports-tabs .admin-table td {
+  padding: 10px 12px;
+  border: 1px solid #eee;
+  font-size: 14px;
+}
+
+/* filter box */
+.reports-tabs .filter-box {
+  background: #fff8f2;
+  border: 1px solid #f1d6c1;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+}
+
+/* responsive: labels stack on small screens */
+@media (max-width: 640px) {
+  .reports-tabs .tabs-labels { flex-wrap: wrap; gap: 6px; padding: 8px; }
+  .reports-tabs .tabs-labels label { padding: 8px 12px; font-size: 13px; }
+}
+
