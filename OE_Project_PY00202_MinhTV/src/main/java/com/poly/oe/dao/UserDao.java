@@ -1,7 +1,8 @@
 package com.poly.oe.dao;
 
-import com.poly.oe.entity.User;
 import java.util.List;
+
+import com.poly.oe.entity.User;
 
 public interface UserDao {
 
@@ -19,6 +20,13 @@ public interface UserDao {
     List<User> findPage(int page, int size);
 
     long countAll();
+
+    List<User> findInactive();
+
+    // Danh sách người dùng đã xóa (soft-delete)
+    java.util.List<User> findDeletedPage(int page, int pageSize);
+    long countDeleted();
+    void restoreMany(java.util.List<String> ids);
 
 
 }

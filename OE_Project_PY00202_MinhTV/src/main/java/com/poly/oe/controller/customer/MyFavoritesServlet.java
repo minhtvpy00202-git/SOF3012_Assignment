@@ -1,4 +1,4 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
 
 import com.poly.oe.dao.FavoriteDao;
 import com.poly.oe.dao.impl.FavoriteDaoImpl;
@@ -27,7 +27,6 @@ public class MyFavoritesServlet extends HttpServlet {
         User user = (session != null) ? (User) session.getAttribute("currentUser") : null;
 
         if (user == null) {
-            // bình thường AuthFilter đã chặn, nhưng đề phòng
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
@@ -35,7 +34,6 @@ public class MyFavoritesServlet extends HttpServlet {
         List<Favorite> favorites = favoriteDao.findByUser(user.getId());
         req.setAttribute("favorites", favorites);
 
-        // dùng layout customer
         req.setAttribute("view", "/views/customer/my-favorites.jsp");
         req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
     }

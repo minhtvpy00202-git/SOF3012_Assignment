@@ -1,8 +1,21 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.poly.oe.dao.CommentDao;
+import com.poly.oe.dao.CommentLikeDao;
+import com.poly.oe.dao.FavoriteDao;
 import com.poly.oe.dao.VideoDao;
+import com.poly.oe.dao.impl.CommentDaoImpl;
+import com.poly.oe.dao.impl.CommentLikeDaoImpl;
+import com.poly.oe.dao.impl.FavoriteDaoImpl;
 import com.poly.oe.dao.impl.VideoDaoImpl;
+import com.poly.oe.entity.Comment;
+import com.poly.oe.entity.User;
 import com.poly.oe.entity.Video;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -10,14 +23,13 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 @WebServlet("/video/detail")
 public class DetailServlet extends HttpServlet {
 
     private final VideoDao videoDao = new VideoDaoImpl();
+    private final FavoriteDao favoriteDao = new FavoriteDaoImpl();
+    private final CommentDao commentDao = new CommentDaoImpl();
+    private final CommentLikeDao commentLikeDao = new CommentLikeDaoImpl();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -29,33 +41,64 @@ public class DetailServlet extends HttpServlet {
             return;
         }
 
-        // 1. Lấy video
         Video video = videoDao.findById(id);
-        if (video == null) {
+        if (video == null || video.isDelete()) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Video không tồn tại");
             return;
         }
 
-        // 2. Tăng view
         video.setViews(video.getViews() + 1);
         videoDao.update(video);
 
-        // 3. Lưu cookie "đã xem"
         saveViewedVideoToCookie(id, req, resp);
 
-        // 4. Lấy danh sách video đã xem gần đây
         List<Video> recentVideos = getRecentVideosFromCookie(req);
 
         req.setAttribute("video", video);
         req.setAttribute("recentVideos", recentVideos);
-
-        // dùng cùng list cho sidebar tạm thời
         req.setAttribute("recentVideosSidebar", recentVideos);
 
-        // trang nội dung chính
-        req.setAttribute("view", "/views/customer/detail.jsp");
+        // Bình luận
+        List<Comment> comments = commentDao.findRootComments(video.getId(), 0, 50);
+        for (Comment c : comments) {
+            List<Comment> replies = commentDao.findReplies(c.getId());
+            c.setReplies(replies);
+        }
+        req.setAttribute("comments", comments);
 
-        // forward layout
+        // Like count và trạng thái liked của current user
+        java.util.Map<Long, Long> likeCounts = new java.util.HashMap<>();
+        java.util.Map<Long, Boolean> likedByMe = new java.util.HashMap<>();
+        for (Comment c : comments) {
+            long cnt = commentLikeDao.countLikes(c.getId());
+            likeCounts.put(c.getId(), cnt);
+            if (c.getReplies() != null) {
+                for (Comment r : c.getReplies()) {
+                    likeCounts.put(r.getId(), commentLikeDao.countLikes(r.getId()));
+                }
+            }
+        }
+        jakarta.servlet.http.HttpSession session = req.getSession(false);
+        User current = session != null ? (User) session.getAttribute("currentUser") : null;
+        if (current != null) {
+            for (Comment c : comments) {
+                likedByMe.put(c.getId(), commentLikeDao.exists(current.getId(), c.getId()));
+                if (c.getReplies() != null) {
+                    for (Comment r : c.getReplies()) {
+                        likedByMe.put(r.getId(), commentLikeDao.exists(current.getId(), r.getId()));
+                    }
+                }
+            }
+        }
+        req.setAttribute("commentLikeCounts", likeCounts);
+        req.setAttribute("commentLikedByMe", likedByMe);
+
+        boolean videoLikedByMe = false;
+        if (current != null) {
+            videoLikedByMe = favoriteDao.findByUserAndVideo(current.getId(), video.getId()) != null;
+        }
+        req.setAttribute("videoLikedByMe", videoLikedByMe);
+        req.setAttribute("view", "/views/customer/detail.jsp");
         req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
     }
 
@@ -69,13 +112,12 @@ public class DetailServlet extends HttpServlet {
                 if (name.equals(ck.getName())) {
                     value = ck.getValue();
                     if (!value.contains(id)) {
-                        value = id + "#" + value;   // dùng # thay cho ,
+                        value = id + "#" + value;
                     }
                 }
             }
         }
 
-        // giới hạn tối đa 5 id
         String[] parts = value.split("#");
         StringBuilder sb = new StringBuilder();
         int count = 0;
@@ -93,7 +135,6 @@ public class DetailServlet extends HttpServlet {
         resp.addCookie(cookie);
     }
 
-
     private List<Video> getRecentVideosFromCookie(HttpServletRequest req) {
         List<Video> list = new ArrayList<>();
         Cookie[] cookies = req.getCookies();
@@ -102,16 +143,15 @@ public class DetailServlet extends HttpServlet {
         String name = "viewed";
         for (Cookie ck : cookies) {
             if (name.equals(ck.getName())) {
-                String[] ids = ck.getValue().split("#");  // tách theo #
+                String[] ids = ck.getValue().split("#");
                 for (String id : ids) {
                     if (!id.isBlank()) {
                         Video v = videoDao.findById(id);
-                        if (v != null) list.add(v);
+                        if (v != null && !v.isDelete()) list.add(v);
                     }
                 }
             }
         }
         return list;
     }
-
 }

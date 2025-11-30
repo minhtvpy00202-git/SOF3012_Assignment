@@ -1,83 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
-<style>
-    .detail-layout {
-        display: grid;
-        grid-template-columns: 3fr 1.2fr;
-        gap: 25px;
-    }
-
-    .video-box {
-        border: 2px solid #f4a460;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-
-    .detail-title-bar {
-        background: #e4f5d2;
-        padding: 6px 10px;
-        font-weight: bold;
-        margin-top: 10px;
-    }
-
-    .detail-desc {
-        padding: 8px 10px;
-        border-top: 1px solid #eee;
-    }
-
-    .detail-actions {
-        margin-top: 10px;
-        text-align: right;
-    }
-
-    .btn-like, .btn-share {
-        border: none;
-        padding: 5px 18px;
-        font-weight: bold;
-        cursor: pointer;
-        margin-left: 6px;
-        border-radius: 3px;
-    }
-
-    .btn-like  { background: #4caf50; color: #fff; }
-    .btn-share { background: #ff7f27; color: #fff; }
-
-    .sidebar-item {
-        display: grid;
-        grid-template-columns: 80px auto;
-        border: 1px solid #8bc34a;
-        margin-bottom: 10px;
-    }
-
-    .sidebar-poster {
-        border-right: 1px solid #8bc34a;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    .sidebar-poster img {
-        max-width: 100%;
-    }
-
-    .sidebar-title {
-        padding: 8px;
-        font-size: 14px;
-    }
-
-    .sidebar-title a {
-        text-decoration: none;
-        color: #000;
-        font-weight: bold;
-    }
-
-    .sidebar-title a:hover {
-        text-decoration: underline;
-    }
-</style>
-
 <div class="detail-layout">
 
     <!-- Cột trái: video chính -->
@@ -92,15 +15,33 @@
             </div>
 
             <div class="detail-desc">
+                <h2>Description</h2>
                 <p>${video.description}</p>
                 <p>Lượt xem: ${video.views}</p>
             </div>
 
             <div class="detail-actions">
-                <form action="${pageContext.request.contextPath}/video/like" method="post" style="display:inline;">
-                    <input type="hidden" name="videoId" value="${video.id}">
-                    <button class="btn-like">Like</button>
-                </form>
+                <c:choose>
+                    <c:when test="${not empty sessionScope.currentUser}">
+                        <c:choose>
+                            <c:when test="${videoLikedByMe}">
+                                <form action="${pageContext.request.contextPath}/video/unlike" method="post" style="display:inline;">
+                                    <input type="hidden" name="videoId" value="${video.id}">
+                                    <button class="btn-like">Unlike</button>
+                                </form>
+                            </c:when>
+                            <c:otherwise>
+                                <form action="${pageContext.request.contextPath}/video/like" method="post" style="display:inline;">
+                                    <input type="hidden" name="videoId" value="${video.id}">
+                                    <button class="btn-like">Like</button>
+                                </form>
+                            </c:otherwise>
+                        </c:choose>
+                    </c:when>
+                    <c:otherwise>
+                        <a class="btn-like" href="${pageContext.request.contextPath}/login">Like</a>
+                    </c:otherwise>
+                </c:choose>
 
                 <form action="${pageContext.request.contextPath}/video/share" method="get" style="display:inline;">
                     <input type="hidden" name="videoId" value="${video.id}">
@@ -108,12 +49,100 @@
                 </form>
             </div>
 
+            <!-- BÌNH LUẬN -->
+            <div class="detail-title-bar" style="margin-top:16px;">COMMENTS</div>
+
+            <div class="comment-form" style="padding: 20px; background: var(--comment-bg); border-radius: 8px; margin-top: 16px;">
+                <c:choose>
+                    <c:when test="${not empty sessionScope.currentUser}">
+                        <form action="${pageContext.request.contextPath}/comment/add" method="post" style="width: 100%;">
+                            <input type="hidden" name="videoId" value="${video.id}" />
+                            <div style="width: 100%;">
+                                <textarea name="content" rows="4" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-family: inherit; font-size: 14px; resize: vertical; box-sizing: border-box;"></textarea>
+                            </div>
+                            <div style="text-align:right; margin-top:12px;">
+                                <button class="btn-share" type="submit">Post Comment</button>
+                            </div>
+                        </form>
+                    </c:when>
+                    <c:otherwise>
+                        <div>Hãy <a href="${pageContext.request.contextPath}/login">đăng nhập</a> để bình luận.</div>
+                    </c:otherwise>
+                </c:choose>
+            </div>
+
+            <c:forEach var="cmt" items="${comments}">
+                <div class="comment-item">
+                    <div class="comment-author">
+                        <c:choose>
+                            <c:when test="${not empty cmt.user.fullname}">${cmt.user.fullname}</c:when>
+                            <c:otherwise>${cmt.user.id}</c:otherwise>
+                        </c:choose>
+                    </div>
+                    <div class="comment-content">${cmt.content}</div>
+                    <div class="comment-actions">
+                        <form action="${pageContext.request.contextPath}/comment/like" method="post" style="display:inline;">
+                            <input type="hidden" name="commentId" value="${cmt.id}" />
+                            <input type="hidden" name="videoId" value="${video.id}" />
+                            <button class="btn-like" type="submit" style="padding:4px 12px; font-size:12px;">
+                                <c:choose>
+                                    <c:when test="${commentLikedByMe[cmt.id]}">Unlike</c:when>
+                                    <c:otherwise>Like</c:otherwise>
+                                </c:choose>
+                            </button>
+                        </form>
+                        <span>${commentLikeCounts[cmt.id]} likes</span>
+                    </div>
+
+                    <!-- form trả lời -->
+                    <c:if test="${not empty sessionScope.currentUser}">
+                        <div style="margin-top:12px; width: 100%;">
+                            <form action="${pageContext.request.contextPath}/comment/reply" method="post" style="width: 100%;">
+                                <input type="hidden" name="parentId" value="${cmt.id}" />
+                                <div style="width: 100%;">
+                                    <input type="text" name="content" style="width:100%; padding:10px; box-sizing:border-box; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg); color:var(--text-primary); font-size: 14px;" placeholder="Viết phản hồi..." />
+                                </div>
+                                <div style="text-align:right; margin-top:8px;">
+                                    <button class="btn-share" type="submit">Reply</button>
+                                </div>
+                            </form>
+                        </div>
+                    </c:if>
+
+                    <!-- danh sách trả lời -->
+                    <c:forEach var="rep" items="${cmt.replies}">
+                        <div class="comment-reply">
+                            <div class="comment-author">
+                                <c:choose>
+                                    <c:when test="${not empty rep.user.fullname}">${rep.user.fullname}</c:when>
+                                    <c:otherwise>${rep.user.id}</c:otherwise>
+                                </c:choose>
+                            </div>
+                            <div class="comment-content">${rep.content}</div>
+                            <div class="comment-actions">
+                                <form action="${pageContext.request.contextPath}/comment/like" method="post" style="display:inline;">
+                                    <input type="hidden" name="commentId" value="${rep.id}" />
+                                    <input type="hidden" name="videoId" value="${video.id}" />
+                                    <button class="btn-like" type="submit" style="padding:4px 12px; font-size:12px;">
+                                        <c:choose>
+                                            <c:when test="${commentLikedByMe[rep.id]}">Unlike</c:when>
+                                            <c:otherwise>Like</c:otherwise>
+                                        </c:choose>
+                                    </button>
+                                </form>
+                                <span>${commentLikeCounts[rep.id]} likes</span>
+                            </div>
+                        </div>
+                    </c:forEach>
+                </div>
+            </c:forEach>
+
         </div>
     </div>
 
     <!-- Cột phải: danh sách video đã xem gần đây -->
     <div>
-        <h3>Video đã xem gần đây</h3>
+        <h3>Recently Watched Videos</h3>
 
         <c:forEach var="v" items="${recentVideos}">
             <div class="sidebar-item">

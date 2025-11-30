@@ -1,47 +1,113 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Profile</title>
-    <style>
-        .box { width: 450px; margin: 30px auto; border: 1px solid #ccc; padding: 20px 30px; background: #fff; }
-        .title { background: #f0ad4e; color: #fff; padding: 10px; margin: -20px -30px 20px -30px; font-weight:bold; }
-        .row { margin-bottom: 10px; }
-        label { display:block; margin-bottom:3px; }
-        input[type=text], input[type=email] { width: 100%; padding:6px; box-sizing:border-box; }
-        .btn { background:#f0ad4e; color:#fff; border:none; padding:8px 20px; cursor:pointer; }
-        .msg { color:red; margin-bottom:10px; }
-    </style>
-</head>
-<body>
-<div class="box">
-    <div class="title">EDIT PROFILE</div>
+
+<style>
+    .account-form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: var(--card-bg);
+        padding: 32px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+    }
+    
+    .account-form-title {
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 24px;
+        color: var(--text-primary);
+    }
+    
+    .account-form-row {
+        margin-bottom: 20px;
+    }
+    
+    .account-form-row label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text-primary);
+    }
+    
+    .account-form-row input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid var(--input-border);
+        border-radius: 8px;
+        background: var(--input-bg);
+        color: var(--text-primary);
+        font-size: 14px;
+        font-family: inherit;
+        box-sizing: border-box;
+    }
+    
+    .account-form-row input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+    }
+    
+    .account-form-row input:disabled,
+    .account-form-row input[readonly] {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    
+    .account-form-submit {
+        width: 100%;
+        background: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    
+    .account-form-submit:hover {
+        opacity: 0.9;
+    }
+    
+    .account-form-message {
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .account-form-message.error {
+        background: var(--error-bg);
+        color: var(--error-color);
+        border: 1px solid var(--error-color);
+    }
+</style>
+
+<div class="account-form-container">
+    <h2 class="account-form-title">Edit Profile</h2>
 
     <c:if test="${not empty message}">
-        <div class="msg">${message}</div>
+        <div class="account-form-message error">${message}</div>
     </c:if>
 
     <form method="post">
-        <div class="row">
-            <label>Username?</label>
+        <div class="account-form-row">
+            <label>Username</label>
             <input type="text" value="${sessionScope.currentUser.id}" readonly>
         </div>
-        <div class="row">
-            <label>Password?</label>
-            <input type="password" value="${sessionScope.currentUser.password}" readonly>
+        <div class="account-form-row">
+            <label>Password</label>
+            <input type="password" value="••••••••" readonly>
         </div>
-        <div class="row">
-            <label>Fullname?</label>
-            <input type="text" name="fullname" value="${sessionScope.currentUser.fullname}">
+        <div class="account-form-row">
+            <label>Full Name</label>
+            <input type="text" name="fullname" value="${sessionScope.currentUser.fullname}" placeholder="Enter your full name">
         </div>
-        <div class="row">
-            <label>Email address?</label>
-            <input type="email" name="email" value="${sessionScope.currentUser.email}">
+        <div class="account-form-row">
+            <label>Email Address</label>
+            <input type="email" name="email" value="${sessionScope.currentUser.email}" placeholder="Enter your email">
         </div>
-        <button class="btn" type="submit">Update</button>
+        <button class="account-form-submit" type="submit">Update Profile</button>
     </form>
 </div>
-</body>
-</html>

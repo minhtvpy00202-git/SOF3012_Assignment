@@ -1,4 +1,4 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
 
 import com.poly.oe.dao.ShareDao;
 import com.poly.oe.dao.VideoDao;
@@ -7,6 +7,8 @@ import com.poly.oe.dao.impl.VideoDaoImpl;
 import com.poly.oe.entity.Share;
 import com.poly.oe.entity.User;
 import com.poly.oe.entity.Video;
+import com.poly.oe.utils.MailUtils;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -50,6 +52,7 @@ public class ShareServlet extends HttpServlet {
 
         HttpSession session = req.getSession();
         User current = (User) session.getAttribute("currentUser");
+
         if (current == null) {
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
@@ -65,29 +68,53 @@ public class ShareServlet extends HttpServlet {
         }
 
         String message;
+
         try {
             if (emails == null || emails.isBlank()) {
                 message = "Vui lòng nhập ít nhất một email.";
             } else {
-                // Tách email theo , hoặc ;
+
                 String[] arr = emails.split("[,;]");
-                int count = 0;
+                int successCount = 0;
+
+                String base = req.getScheme() + "://" + req.getServerName()
+                        + (req.getServerPort() == 80 || req.getServerPort() == 443 ? "" : ":" + req.getServerPort())
+                        + req.getContextPath();
+
                 for (String e : arr) {
                     String mail = e.trim();
-                    if (!mail.isEmpty()) {
+                    if (mail.isEmpty()) continue;
+
+                    try {
+                        String link = base + "/video/detail?id=" + v.getId();
+                        String subject = "OE - Trích đoạn: " + v.getTitle();
+                        String html =
+                                "<p>Xin chào,</p>" +
+                                        "<p>" + current.getFullname() + " vừa chia sẻ một tiểu phẩm tới bạn.</p>" +
+                                        "<p>Tiêu đề: <strong>" + v.getTitle() + "</strong></p>" +
+                                        "<p>Xem tại: <a href='" + link + "'>" + link + "</a></p>" +
+                                        "<p>Trân trọng,<br>OE Online Entertainment</p>";
+
+                        MailUtils.sendHtmlMail(mail, subject, html);
+
                         Share s = new Share();
                         s.setUser(current);
                         s.setVideo(v);
                         s.setEmail(mail);
                         s.setShareDate(new Date());
                         shareDao.create(s);
-                        count++;
 
-                        // TODO: gửi mail thật bằng JavaMail nếu cấu hình
+                        successCount++;
+
+                    } catch (Exception mailEx) {
+                        System.err.println("Lỗi gửi email tới: " + mail);
+                        mailEx.printStackTrace();
                     }
                 }
-                message = "Đã gửi link cho " + count + " email (demo).";
+
+                message = "Đã gửi link thành công cho " + successCount + " email.";
             }
+
         } catch (Exception ex) {
             ex.printStackTrace();
             message = "Lỗi: " + ex.getMessage();

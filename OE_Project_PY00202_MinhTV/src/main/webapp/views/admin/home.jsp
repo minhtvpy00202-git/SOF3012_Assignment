@@ -22,7 +22,7 @@
            href="${pageContext.request.contextPath}/admin/videos">Quản lý Video</a>
         <a class="btn btn-primary"
            href="${pageContext.request.contextPath}/admin/users">Quản lý Người dùng</a>
-        <a class="btn btn-secondary"
+        <a class="btn btn-primary"
            href="${pageContext.request.contextPath}/admin/reports">Báo cáo – Thống kê</a>
     </div>
 

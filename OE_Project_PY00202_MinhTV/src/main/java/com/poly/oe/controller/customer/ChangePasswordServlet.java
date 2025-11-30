@@ -1,4 +1,4 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
 
 import com.poly.oe.dao.UserDao;
 import com.poly.oe.dao.impl.UserDaoImpl;
@@ -12,8 +12,8 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
-@WebServlet("/account/edit-profile")
-public class EditProfileServlet extends HttpServlet {
+@WebServlet("/account/change-password")
+public class ChangePasswordServlet extends HttpServlet {
 
     private final UserDao userDao = new UserDaoImpl();
 
@@ -21,7 +21,7 @@ public class EditProfileServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        req.setAttribute("view", "/views/account/edit-profile.jsp");
+        req.setAttribute("view", "/views/account/change-password.jsp");
         req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
     }
 
@@ -32,19 +32,24 @@ public class EditProfileServlet extends HttpServlet {
         HttpSession session = req.getSession();
         User current = (User) session.getAttribute("currentUser");
 
-        String fullname = req.getParameter("fullname");
-        String email    = req.getParameter("email");
+        String username = req.getParameter("username");
+        String currentPw = req.getParameter("currentPassword");
+        String newPw = req.getParameter("newPassword");
+        String confirm = req.getParameter("confirm");
 
         String message;
         try {
-            if (current == null) {
-                message = "Bạn chưa đăng nhập.";
+            if (current == null || !current.getId().equals(username)) {
+                message = "Sai username hoặc chưa đăng nhập.";
+            } else if (!current.getPassword().equals(currentPw)) {
+                message = "Mật khẩu hiện tại không đúng.";
+            } else if (newPw == null || !newPw.equals(confirm)) {
+                message = "Xác nhận mật khẩu mới không khớp.";
             } else {
-                current.setFullname(fullname);
-                current.setEmail(email);
+                current.setPassword(newPw);
                 userDao.update(current);
                 session.setAttribute("currentUser", current);
-                message = "Cập nhật tài khoản thành công.";
+                message = "Đổi mật khẩu thành công.";
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,7 +57,7 @@ public class EditProfileServlet extends HttpServlet {
         }
 
         req.setAttribute("message", message);
-        req.setAttribute("view", "/views/account/edit-profile.jsp");
+        req.setAttribute("view", "/views/account/change-password.jsp");
         req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
     }
 }

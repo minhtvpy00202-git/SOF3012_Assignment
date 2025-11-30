@@ -1,17 +1,17 @@
 package com.poly.oe.controller.admin;
 
+import java.io.IOException;
+import java.util.List;
+
 import com.poly.oe.dao.UserDao;
 import com.poly.oe.dao.impl.UserDaoImpl;
 import com.poly.oe.entity.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.val;
-
-import java.io.IOException;
-import java.util.List;
 
 @WebServlet("/admin/users")
 public class AdminUserServlet extends HttpServlet {
@@ -24,6 +24,7 @@ public class AdminUserServlet extends HttpServlet {
 
         String action = req.getParameter("action");
         String id = req.getParameter("id");
+        String tab = req.getParameter("tab");
 
         // Trạng thái form:
         // - Nếu click Edit -> load user lên form, editing = true
@@ -34,8 +35,16 @@ public class AdminUserServlet extends HttpServlet {
             prepareInitialForm(req);
         }
 
-        // Luôn load danh sách người dùng (10 / trang)
-        loadUserList(req);
+        // Luôn load danh sách theo tab
+        if ("deleted".equals(tab)) {
+            loadDeletedUserList(req);
+        } else {
+            loadUserList(req);
+        }
+
+        // Danh sách chờ duyệt
+        List<User> pending = userDao.findInactive();
+        req.setAttribute("pendingUsers", pending);
 
         req.setAttribute("view", "/views/admin/users.jsp");
         req.getRequestDispatcher("/views/layout/admin.jsp").forward(req, resp);
@@ -57,6 +66,7 @@ public class AdminUserServlet extends HttpServlet {
                 u.setFullname(req.getParameter("fullname"));
                 u.setEmail(req.getParameter("email"));
                 u.setAdmin(req.getParameter("admin") != null);
+                u.setActive(req.getParameter("active") != null);
 
                 if (u.getId() == null || u.getId().isBlank()) {
                     throw new RuntimeException("Username không được để trống");
@@ -87,6 +97,7 @@ public class AdminUserServlet extends HttpServlet {
                 u.setFullname(req.getParameter("fullname"));
                 u.setEmail(req.getParameter("email"));
                 u.setAdmin(req.getParameter("admin") != null);
+                u.setActive(req.getParameter("active") != null);
 
                 userDao.update(u);
                 req.setAttribute("message", "Đã cập nhật người dùng");
@@ -110,6 +121,30 @@ public class AdminUserServlet extends HttpServlet {
             } else if ("reset".equals(action)) {
                 // ===== RESET FORM =====
                 prepareInitialForm(req);
+            } else if ("approve".equals(action)) {
+                // ===== DUYỆT TÀI KHOẢN =====
+                String id = req.getParameter("id");
+                if (id == null || id.isBlank()) {
+                    throw new RuntimeException("Chưa chọn tài khoản để duyệt");
+                }
+                User u = userDao.findById(id);
+                if (u == null) {
+                    throw new RuntimeException("Không tìm thấy người dùng: " + id);
+                }
+                u.setActive(true);
+                userDao.update(u);
+                req.setAttribute("message", "Đã duyệt tài khoản: " + id);
+                prepareInitialForm(req);
+            } else if ("restore".equals(action)) {
+                String[] ids = req.getParameterValues("ids");
+                java.util.List<String> list = new java.util.ArrayList<>();
+                if (ids != null) {
+                    for (String s : ids) if (s != null && !s.isBlank()) list.add(s);
+                }
+                userDao.restoreMany(list);
+                req.setAttribute("message", "Đã khôi phục " + list.size() + " tài khoản");
+                req.setAttribute("activeTab", "deleted");
+                loadDeletedUserList(req);
             }
 
         } catch (Exception e) {
@@ -123,6 +158,7 @@ public class AdminUserServlet extends HttpServlet {
             form.setFullname(req.getParameter("fullname"));
             form.setEmail(req.getParameter("email"));
             form.setAdmin(req.getParameter("admin") != null);
+            form.setActive(req.getParameter("active") != null);
 
             // Nếu đang edit mà lỗi trong update/delete thì để editing=true;
             boolean editing = "update".equals(action) || "delete".equals(action);
@@ -130,8 +166,14 @@ public class AdminUserServlet extends HttpServlet {
             req.setAttribute("editing", editing);
         }
 
-        // Luôn reload lại danh sách người dùng
-        loadUserList(req);
+        // Luôn reload lại danh sách theo tab
+        String tab = req.getParameter("tab");
+        if ("deleted".equals(tab) || "restore".equals(action)) {
+            loadDeletedUserList(req);
+        } else {
+            loadUserList(req);
+        }
+        req.setAttribute("pendingUsers", userDao.findInactive());
         req.setAttribute("view", "/views/admin/users.jsp");
         req.getRequestDispatcher("/views/layout/admin.jsp").forward(req, resp);
     }
@@ -167,6 +209,18 @@ public class AdminUserServlet extends HttpServlet {
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPage", totalPage);
         req.setAttribute("totalUsers", total);
+    }
+
+    private void loadDeletedUserList(HttpServletRequest req) {
+        int page = parseInt(req.getParameter("page"), 1);
+        int pageSize = 10;
+        java.util.List<User> list = userDao.findDeletedPage(page, pageSize);
+        long total = userDao.countDeleted();
+        long totalPage = (long) Math.ceil(total * 1.0 / pageSize);
+
+        req.setAttribute("deletedUsers", list);
+        req.setAttribute("deletedCurrentPage", page);
+        req.setAttribute("deletedTotalPage", totalPage);
     }
 
     private int parseInt(String val, int defaultVal) {

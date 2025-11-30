@@ -13,37 +13,50 @@
 <c:if test="${param.tab == 'list'}">
     <c:set var="activeTab" value="list" />
 </c:if>
+<c:if test="${param.tab == 'deleted'}">
+    <c:set var="activeTab" value="deleted" />
+</c:if>
 <c:if test="${param.action == 'edit'}">
     <c:set var="activeTab" value="edit" />
 </c:if>
 
 <style>
-    /* KHUNG TAB GIỐNG ĐỀ */
+    /* Video Admin Wrapper - Use CSS Variables */
     .video-admin-wrapper {
-        border: 1px solid #f0a060;
+        border: 1px solid var(--border-color);
         margin-top: 10px;
-        background: #fff;
+        background: var(--card-bg);
+        border-radius: 8px;
+        overflow: hidden;
     }
     .video-admin-tabs {
         display: flex;
-        border-bottom: 1px solid #f0a060;
+        border-bottom: 2px solid var(--border-color);
+        background: var(--input-bg);
     }
     .video-admin-tab {
-        padding: 6px 16px;
-        font-weight: bold;
+        padding: 12px 24px;
+        font-weight: 500;
         text-transform: uppercase;
-        border-right: 1px solid #f0a060;
         text-decoration: none;
-        color: #444;
-        background: #fbead7;
+        color: var(--text-secondary);
+        background: transparent;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+        font-size: 14px;
+    }
+    .video-admin-tab:hover {
+        color: var(--text-primary);
     }
     .video-admin-tab.active {
-        background: #ffffff;
-        color: #c32a12;
-        border-bottom: 2px solid #ffffff;
+        background: var(--card-bg);
+        color: var(--accent-color);
+        border-bottom-color: var(--accent-color);
+        font-weight: 600;
     }
     .video-admin-body {
-        padding: 15px 20px 20px 20px;
+        padding: 20px 24px;
+        background: var(--card-bg);
     }
     .video-tab-pane {
         display: none;
@@ -52,125 +65,115 @@
         display: block;
     }
 
-    /* POSTER + FORM LAYOUT */
+    /* Poster + Form Layout */
     .video-edit-layout {
         display: grid;
-        grid-template-columns: 320px auto;
-        gap: 20px;
+        grid-template-columns: 300px 1fr;
+        gap: 24px;
     }
     .poster-panel {
         padding-top: 10px;
     }
     .poster-box {
-        border: 2px solid #f4a460;
-        background: #fbfbfb;
-        width: 260px;
+        border: 2px solid var(--border-color);
+        background: var(--input-bg);
+        width: 100%;
         height: 220px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 18px;
-        color: #555;
-        margin-bottom: 10px;
+        color: var(--text-secondary);
+        margin-bottom: 16px;
+        border-radius: 8px;
     }
     .poster-box img {
         max-width: 100%;
         max-height: 100%;
+        border-radius: 8px;
     }
+    .poster-hidden {
+        display: none;
+    }
+    
     .admin-form-row {
-        margin-bottom: 10px;
+        margin-bottom: 16px;
     }
     .admin-form-row label {
-        display: inline-block;
-        width: 120px;
-        font-weight: bold;
-        text-transform: uppercase;
-        font-size: 13px;
+        display: block;
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+        font-size: 14px;
     }
     .admin-form-row input[type="text"],
     .admin-form-row input[type="number"],
+    .admin-form-row input[type="file"],
     .admin-form-row textarea {
-        border: 1px solid #f4a460;
-        padding: 4px 6px;
+        border: 1px solid var(--input-border);
+        border-radius: 8px;
+        padding: 10px 12px;
         width: 100%;
         box-sizing: border-box;
+        background: var(--input-bg);
+        color: var(--text-primary);
+        font-size: 14px;
+    }
+    .admin-form-row input:focus,
+    .admin-form-row textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
     }
     .admin-form-row textarea {
-        min-height: 80px;
+        min-height: 100px;
+        resize: vertical;
     }
+    
     .admin-form-actions {
-        margin-top: 15px;
+        margin-top: 20px;
         text-align: center;
-        padding-top: 10px;
-        border-top: 1px solid #f4a460;
+        padding-top: 16px;
+        border-top: 1px solid var(--border-color);
     }
     .btn-orange {
-        background: #d9d9d9;
-        border: 1px solid #999;
-        padding: 6px 22px;
-        margin: 0 5px;
-        font-weight: bold;
+        background: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        padding: 8px 20px;
+        margin: 0 6px;
+        font-weight: 500;
         cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+    }
+    .btn-orange:hover {
+        opacity: 0.9;
     }
     .btn-orange:disabled {
         opacity: 0.4;
-        cursor: default;
+        cursor: not-allowed;
     }
 
-    /* BẢNG LIST */
-    .admin-subtitle {
-        font-size: 16px;
-        margin-bottom: 8px;
-    }
-    .admin-table {
-        width: 100%;
-        border-collapse: collapse;
-        border: 1px solid #f0a060;
-        font-size: 13px;
-    }
-    .admin-table th,
-    .admin-table td {
-        border: 1px solid #f0a060;
-        padding: 4px 6px;
-    }
-    .admin-table th {
-        background: #fbe9d7;
-        text-align: left;
-    }
+    /* Pagination */
     .pagination {
-        margin-top: 10px;
+        margin-top: 16px;
         text-align: left;
     }
     .pagination button {
-        background: #d9d9d9;
-        border: 1px solid #999;
-        padding: 4px 10px;
+        background: var(--bg-hover);
+        border: 1px solid var(--border-color);
+        color: var(--text-primary);
+        padding: 6px 12px;
         margin-right: 4px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 500;
+        border-radius: 6px;
+        transition: all 0.2s ease;
     }
-
-    /* message */
-    .admin-message {
-        margin-top: 10px;
-        padding: 6px 10px;
-        border-radius: 3px;
+    .pagination button:hover {
+        background: var(--input-bg);
+        border-color: var(--accent-color);
     }
-    .admin-message.success {
-        background: #e8f5e9;
-        border: 1px solid #8bc34a;
-        color: #2e7d32;
-    }
-    .admin-message.error {
-        background: #ffebee;
-        border: 1px solid #e57373;
-        color: #c62828;
-    }
-
-        .poster-hidden {
-            display: none;
-        }
-
 </style>
 
 <h1 class="admin-title">VIDEO MANAGEMENT</h1>
@@ -186,6 +189,10 @@
         <a class="video-admin-tab ${activeTab == 'list' ? 'active' : ''}"
            href="${ctx}/admin/videos?tab=list">
             VIDEO LIST
+        </a>
+        <a class="video-admin-tab ${activeTab == 'deleted' ? 'active' : ''}"
+           href="${ctx}/admin/videos?tab=deleted">
+            DELETED LIST
         </a>
     </div>
 
@@ -326,6 +333,7 @@
             })();
         </script>
 
+        </div>
 
         <!-- TAB 2: LIST -->
         <div class="video-tab-pane ${activeTab == 'list' ? 'active' : ''}" id="tab-list">
@@ -370,6 +378,51 @@
                     <button name="page" value="${currentPage > 1 ? currentPage - 1 : 1}">&lt;&lt;</button>
                     <button name="page" value="${currentPage < totalPage ? currentPage + 1 : totalPage}">&gt;&gt;</button>
                     <button name="page" value="${totalPage}">&gt;|</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB 3: DELETED LIST -->
+        <div class="video-tab-pane ${activeTab == 'deleted' ? 'active' : ''}" id="tab-deleted">
+            <h2 class="admin-subtitle">DELETED VIDEOS</h2>
+
+            <form action="${ctx}/admin/videos" method="post">
+                <input type="hidden" name="action" value="restore" />
+                <input type="hidden" name="tab" value="deleted" />
+
+                <table class="admin-table">
+                    <thead>
+                    <tr>
+                        <th style="width:32px"><input type="checkbox" onclick="document.querySelectorAll('#tab-deleted input[type=checkbox].rowchk').forEach(cb=>cb.checked=this.checked)"></th>
+                        <th>Youtube Id</th>
+                        <th>Video Title</th>
+                        <th>View Count</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <c:forEach var="v" items="${deletedVideos}">
+                        <tr>
+                            <td><input class="rowchk" type="checkbox" name="ids" value="${v.id}" /></td>
+                            <td>${v.id}</td>
+                            <td>${v.title}</td>
+                            <td>${v.views}</td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+
+                <div class="admin-form-actions" style="text-align:right">
+                    <button class="btn-orange" type="submit">Restore Selected</button>
+                </div>
+            </form>
+
+            <div class="pagination">
+                <form action="${ctx}/admin/videos" method="get">
+                    <input type="hidden" name="tab" value="deleted"/>
+                    <button name="page" value="1">|&lt;</button>
+                    <button name="page" value="${deletedCurrentPage > 1 ? deletedCurrentPage - 1 : 1}">&lt;&lt;</button>
+                    <button name="page" value="${deletedCurrentPage < deletedTotalPage ? deletedCurrentPage + 1 : deletedTotalPage}">&gt;&gt;</button>
+                    <button name="page" value="${deletedTotalPage}">&gt;|</button>
                 </form>
             </div>
         </div>

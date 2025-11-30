@@ -1,4 +1,4 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
 
 import com.poly.oe.entity.Video;
 import com.poly.oe.utils.JpaUtils;
@@ -33,4 +33,3 @@ public class TestJpaServlet extends HttpServlet {
         }
     }
 }
-

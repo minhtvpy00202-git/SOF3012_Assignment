@@ -1,182 +1,338 @@
-/* ==== Layout chung cho admin ==== */
+/* YouTube-Inspired Admin Theme - Matching Customer Style */
+:root { 
+    --bg-primary: #f9f9f9;
+    --bg-secondary: #ffffff;
+    --bg-hover: #f2f2f2;
+    --text-primary: #030303;
+    --text-secondary: #606060;
+    --border-color: #e5e5e5;
+    --header-bg: #ffffff;
+    --menu-bg: #f9f9f9;
+    --accent-color: #065fd4;
+    --accent-hover: #0448a8;
+    --button-bg: #065fd4;
+    --button-text: #ffffff;
+    --card-bg: #ffffff;
+    --input-bg: #f1f1f1;
+    --input-border: #cccccc;
+    --success-color: #065fd4;
+    --danger-color: #cc0000;
+}
 
-body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f5f5f5;
+body[data-theme="dark"] { 
+    --bg-primary: #0f0f0f;
+    --bg-secondary: #212121;
+    --bg-hover: #3a3a3a;
+    --text-primary: #f1f1f1;
+    --text-secondary: #aaaaaa;
+    --border-color: #3a3a3a;
+    --header-bg: #212121;
+    --menu-bg: #212121;
+    --accent-color: #3ea6ff;
+    --accent-hover: #65b8ff;
+    --button-bg: #3ea6ff;
+    --button-text: #0f0f0f;
+    --card-bg: #212121;
+    --input-bg: #121212;
+    --input-border: #3a3a3a;
+    --success-color: #3ea6ff;
+    --danger-color: #ff4444;
+}
+
+body { 
+    font-family: "Roboto", Arial, Helvetica, sans-serif; 
+    background: var(--bg-primary); 
+    color: var(--text-primary); 
     margin: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Header + menu */
-
-header {
-    background: #f37b1f;
-    color: #fff;
-    padding: 10px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,.15);
+/* Top Bar - Similar to Customer */
+.admin-top-bar {
+    background: var(--header-bg);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.admin-header-inner {
-    max-width: 1100px;
-    margin: 0 auto;
+.admin-top-bar span:first-child {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
 }
 
-header h2 {
-    margin: 0 0 8px 0;
-    font-size: 22px;
+/* Theme Toggle Button - Similar to Customer */
+.admin-theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-/* Thanh menu */
-
-header nav {
-    background: #333;
-    padding: 6px 10px;
-    border-radius: 3px;
-}
-
-header nav a {
-    color: #fff;
-    text-decoration: none;
-    margin-right: 18px;
+.admin-theme-toggle button { 
+    padding: 8px 16px; 
+    border-radius: 18px; 
+    border: 1px solid var(--border-color); 
+    background: var(--bg-hover); 
+    color: var(--text-primary);
+    cursor: pointer; 
+    font-weight: 500;
     font-size: 14px;
-    font-weight: bold;
+    transition: all 0.2s ease;
 }
 
-header nav a:hover {
-    text-decoration: underline;
+.admin-theme-toggle button:hover { 
+    background: var(--bg-secondary);
+    border-color: var(--accent-color);
 }
 
-/* Vùng nội dung */
-
-main {
-    max-width: 1100px;
-    margin: 20px auto;
-    background: #fff;
-    padding: 20px 25px;
-    box-shadow: 0 0 5px rgba(0,0,0,.2);
-    min-height: 500px;
+/* Navigation Menu - Similar to Customer */
+.admin-menu { 
+    background: var(--menu-bg); 
+    color: var(--text-primary); 
+    padding: 12px 24px; 
+    display: flex; 
+    align-items: center; 
+    gap: 24px;
+    border-bottom: 1px solid var(--border-color);
 }
 
-/* ==== Trang chủ admin (dashboard) ==== */
+.admin-menu a { 
+    color: var(--text-primary); 
+    text-decoration: none; 
+    font-size: 14px; 
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
 
+.admin-menu a:hover { 
+    background: var(--bg-hover);
+    color: var(--accent-color);
+}
+
+/* Legacy header support */
+header { 
+    background: var(--header-bg); 
+    color: var(--text-primary); 
+    padding: 0; 
+    box-shadow: none;
+    border-bottom: none;
+}
+
+.admin-header-inner { 
+    max-width: 1280px; 
+    margin: 0 auto; 
+    padding: 0; 
+}
+
+header h2 { 
+    display: none;
+}
+
+header nav { 
+    background: transparent; 
+    padding: 0; 
+    border-radius: 0; 
+    display: flex; 
+    align-items: center; 
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+header nav a { 
+    color: var(--text-primary); 
+    text-decoration: none; 
+    font-size: 14px; 
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+header nav a:hover { 
+    background: var(--bg-hover);
+    color: var(--accent-color);
+}
+
+/* Main content area - Similar to Customer */
+main { 
+    max-width: 1280px; 
+    margin: 24px auto; 
+    background: var(--bg-secondary); 
+    padding: 24px; 
+    border-radius: 12px;
+    min-height: 500px; 
+}
+
+/* ==== Admin pages ==== */
 .admin-page {
-    /* cho đẹp chút thôi, dùng chung cho nhiều trang admin */
+    width: 100%;
 }
 
 .admin-title {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 0 0 20px 0;
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0 0 24px 0;
+    color: var(--text);
 }
 
-/* Ô thống kê */
+h1.admin-title {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--text);
+}
 
+/* Statistics boxes */
 .admin-stat-grid {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
 }
 
 .stat-box {
-    flex: 1;
-    background: #fffbe6;
-    border: 1px solid #f0ad4e;
-    border-radius: 4px;
-    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
 }
 
 .stat-label {
-    font-size: 13px;
-    color: #666;
-    margin-bottom: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    font-weight: 500;
 }
 
 .stat-value {
-    font-size: 24px;
-    font-weight: bold;
-    color: #d9534f;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--accent-color);
 }
 
-/* Nút lối tắt */
-
+/* Action buttons */
 .admin-shortcuts {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 .btn {
     display: inline-block;
-    padding: 6px 16px;
-    margin-right: 10px;
-    margin-bottom: 6px;
-    border-radius: 3px;
+    padding: 10px 20px;
+    margin-right: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     text-decoration: none;
     font-size: 14px;
-    font-weight: bold;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
 .btn-primary {
-    background: #5cb85c;
-    color: #fff;
+    background: var(--button-bg);
+    color: var(--button-text);
+}
+
+.btn-primary:hover {
+    background: var(--accent-hover);
 }
 
 .btn-secondary {
-    background: #5bc0de;
-    color: #fff;
+    background: var(--text-secondary);
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background: #4a4a4a;
+}
+
+body[data-theme="dark"] .btn-secondary {
+    background: #606060;
+}
+
+body[data-theme="dark"] .btn-secondary:hover {
+    background: #757575;
 }
 
 .btn-danger {
-    background: #d9534f;
-    color: #fff;
+    background: var(--danger-color);
+    color: #ffffff;
 }
 
-.btn:hover {
+.btn-danger:hover {
     opacity: 0.9;
 }
 
-/* Tiêu đề phụ, dùng chung */
-
+/* Subtitles */
 .admin-subtitle {
     font-size: 18px;
-    margin: 10px 0;
+    font-weight: 500;
+    margin: 20px 0 12px 0;
+    color: var(--text-primary);
 }
 
-/* Bảng dùng chung cho mọi trang admin (videos, users, reports) */
-
+/* Tables */
 .admin-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    background: var(--card-bg);
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .admin-table th,
 .admin-table td {
-    border: 1px solid #ddd;
-    padding: 6px 8px;
+    border: 1px solid var(--border-color);
+    padding: 12px;
     text-align: left;
 }
 
 .admin-table th {
-    background: #f0f0f0;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
-/* Form trong admin */
+.admin-table td {
+    color: var(--text-primary);
+}
 
+.admin-table tbody tr:hover {
+    background: var(--bg-hover);
+}
+
+/* Forms */
 .admin-form {
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    padding: 10px 15px;
-    background: #f9f9f9;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-color);
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 8px;
 }
 
 .admin-form-row {
-    margin-bottom: 8px;
+    margin-bottom: 16px;
 }
 
 .admin-form-row label {
     display: inline-block;
-    width: 120px;
-    font-size: 13px;
+    width: 140px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
 }
 
 .admin-form-row input[type="text"],
@@ -184,127 +340,120 @@ main {
 .admin-form-row input[type="email"],
 .admin-form-row textarea,
 .admin-form-row select {
-    width: 260px;
-    padding: 4px 6px;
-    font-size: 13px;
+    width: 300px;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-family: inherit;
 }
 
-/* Hàng nút trong form */
+.admin-form-row input:focus,
+.admin-form-row textarea:focus,
+.admin-form-row select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
 
+/* Form actions */
 .admin-form-actions {
-    margin-top: 10px;
+    margin-top: 16px;
 }
 
-/* Thông báo */
-
+/* Messages */
 .admin-message {
-    margin-bottom: 10px;
-    padding: 6px 10px;
-    border-radius: 3px;
-    font-size: 13px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
 }
 
 .admin-message.success {
-    background: #dff0d8;
-    color: #3c763d;
-    border: 1px solid #d6e9c6;
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #15803d;
 }
 
 .admin-message.error {
-    background: #f2dede;
-    color: #a94442;
-    border: 1px solid #ebccd1;
+    background: #fef2f2;
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
 }
 
-/* ===== Reports tabs - styled like design (angled corners, orange accent) ===== */
+body[data-theme="dark"] .admin-message.success {
+    background: #1a3a1a;
+    color: #4ade80;
+    border-color: #4ade80;
+}
 
+body[data-theme="dark"] .admin-message.error {
+    background: #3a1a1a;
+    color: var(--danger-color);
+    border-color: var(--danger-color);
+}
+
+/* Reports tabs - YouTube style */
 .reports-tabs {
-  border: 1px solid #e6e0d9;
-  background: #fff;
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
   padding: 0;
-  border-radius: 6px;
+  border-radius: 12px;
   overflow: visible;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
-/* hide the radios */
+/* Hide radio buttons */
 .reports-tabs input[type="radio"] { display: none; }
 
-/* tab labels container */
+/* Tab labels container */
 .reports-tabs .tabs-labels {
   display: flex;
-  gap: 0;
-  padding: 0 10px;
+  gap: 8px;
+  padding: 16px 16px 0 16px;
   margin: 0;
   background: transparent;
+  border-bottom: 1px solid var(--border-color);
 }
 
-/* each tab label */
+/* Each tab label */
 .reports-tabs .tabs-labels label {
   position: relative;
   display: inline-block;
-  padding: 10px 20px;
-  margin-right: 6px;
+  padding: 12px 24px;
   cursor: pointer;
-  font-weight: 700;
-  color: #b84a00;          /* dark orange text */
-  background: linear-gradient(#fff, #fff);
-  border: 1px solid transparent;
-  border-bottom: none;
-  border-radius: 6px 6px 0 0;
-  box-shadow: none;
-  transition: all .15s ease;
-  z-index: 2;
-}
-
-/* small angled corner effect using :before */
-.reports-tabs .tabs-labels label:before {
-  content: '';
-  position: absolute;
-  right: -12px;
-  top: 0;
-  width: 12px;
-  height: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
   background: transparent;
-  transform: skewX(-25deg);
-  border-top: 1px solid transparent;
-  border-right: 1px solid transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  font-size: 14px;
 }
 
-/* default inactive label style (light border) */
-.reports-tabs .tabs-labels label {
-  border: 1px solid #e6e0d9;
-  background: #faf6f2;
-  color: #b84a00;
+.reports-tabs .tabs-labels label:hover {
+  color: var(--text-primary);
 }
 
-/* active label style when radio checked */
+/* Active tab style */
 .reports-tabs input#tab1:checked ~ .tabs-labels label[for="tab1"],
 .reports-tabs input#tab2:checked ~ .tabs-labels label[for="tab2"],
 .reports-tabs input#tab3:checked ~ .tabs-labels label[for="tab3"] {
-  background: #fff;
-  color: #b84a00;
-  border-color: #e27a2f;        /* orange border for active */
-  box-shadow: 0 -2px 0 rgba(226,122,47,0.06) inset;
+  color: var(--text-primary);
+  border-bottom-color: var(--accent-color);
+  font-weight: 600;
 }
 
-/* emphasize active tab text color slightly darker */
-.reports-tabs input#tab1:checked ~ .tabs-labels label[for="tab1"],
-.reports-tabs input#tab2:checked ~ .tabs-labels label[for="tab2"],
-.reports-tabs input#tab3:checked ~ .tabs-labels label[for="tab3"] {
-  font-weight: 800;
-}
-
-/* Panel area - placed below labels, with top border that matches active tab */
+/* Panel area */
 .reports-tabs .tab-content {
-  padding: 16px;
-  border-top: 2px solid #e27a2f; /* orange line across top of content to match style */
-  background: #fff;
-  border-radius: 0 0 6px 6px;
-  margin-top: -2px; /* pull up to visually connect with active tab */
+  padding: 20px;
+  background: var(--card-bg);
+  border-radius: 0 0 12px 12px;
 }
 
-/* hide all panels; show only active via :checked */
+/* Hide all panels; show only active */
 .reports-tabs .panel { display: none; }
 .reports-tabs input#tab1:checked ~ .tab-content #panel1,
 .reports-tabs input#tab2:checked ~ .tab-content #panel2,
@@ -312,32 +461,112 @@ main {
   display: block;
 }
 
-/* tweak table inside tab for visual spacing */
+/* Table inside tabs */
 .reports-tabs .admin-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .reports-tabs .admin-table th,
 .reports-tabs .admin-table td {
-  padding: 10px 12px;
-  border: 1px solid #eee;
+  padding: 12px;
+  border: 1px solid var(--border-color);
   font-size: 14px;
 }
 
-/* filter box */
+/* Filter box */
 .reports-tabs .filter-box {
-  background: #fff8f2;
-  border: 1px solid #f1d6c1;
-  padding: 12px;
-  margin-bottom: 12px;
-  border-radius: 4px;
+  background: var(--input-bg);
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  margin-bottom: 16px;
+  border-radius: 8px;
 }
 
-/* responsive: labels stack on small screens */
+/* Responsive */
 @media (max-width: 640px) {
-  .reports-tabs .tabs-labels { flex-wrap: wrap; gap: 6px; padding: 8px; }
-  .reports-tabs .tabs-labels label { padding: 8px 12px; font-size: 13px; }
+  .reports-tabs .tabs-labels { 
+    flex-wrap: wrap; 
+    gap: 4px; 
+    padding: 12px 12px 0 12px; 
+  }
+  .reports-tabs .tabs-labels label { 
+    padding: 10px 16px; 
+    font-size: 13px; 
+  }
 }
 
+
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 1024px) {
+    .admin-header-inner {
+        padding: 0 16px;
+    }
+    
+    main {
+        margin: 16px;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    header nav {
+        gap: 4px;
+    }
+    
+    header nav a {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    
+    .admin-stat-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .admin-form-row label {
+        display: block;
+        width: 100%;
+        margin-bottom: 4px;
+    }
+    
+    .admin-form-row input[type="text"],
+    .admin-form-row input[type="password"],
+    .admin-form-row input[type="email"],
+    .admin-form-row textarea,
+    .admin-form-row select {
+        width: 100%;
+    }
+    
+    .admin-table {
+        font-size: 13px;
+    }
+    
+    .admin-table th,
+    .admin-table td {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h2 {
+        font-size: 18px;
+    }
+    
+    .admin-theme-toggle button {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+    
+    main {
+        padding: 16px;
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}

@@ -3,44 +3,92 @@
 
 <style>
     .share-box {
-        border: 2px solid #f4a460;
-        padding: 15px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 24px;
+        max-width: 600px;
+        margin: 0 auto;
     }
 
     .share-title {
         font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 10px;
+        font-weight: 500;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+    }
+
+    .share-box p {
+        margin-bottom: 20px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+
+    .share-box a {
+        color: var(--accent-color);
+        word-break: break-all;
     }
 
     .form-row {
-        margin-bottom: 10px;
+        margin-bottom: 16px;
     }
 
-    label {
+    .form-row label {
         display: block;
-        margin-bottom: 4px;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 14px;
     }
 
-    input[type=text], textarea {
+    .form-row textarea {
         width: 100%;
         box-sizing: border-box;
-        padding: 6px;
+        padding: 12px;
+        border: 1px solid var(--input-border);
+        border-radius: 8px;
+        background: var(--input-bg);
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 14px;
+        resize: vertical;
+    }
+
+    .form-row textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
     }
 
     .btn-send {
-        background: #ff7f27;
+        background: var(--share-button);
         border: none;
-        color: #fff;
-        padding: 6px 20px;
+        color: #ffffff;
+        padding: 10px 24px;
         cursor: pointer;
-        font-weight: bold;
+        font-weight: 500;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: opacity 0.2s ease;
+    }
+
+    .btn-send:hover {
+        opacity: 0.9;
     }
 
     .message {
-        margin-top: 10px;
-        color: green;
-        font-weight: bold;
+        margin-top: 16px;
+        padding: 12px;
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #15803d;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+
+    body[data-theme="dark"] .message {
+        background: #1a3a1a;
+        color: #4ade80;
+        border-color: #4ade80;
     }
 </style>
 

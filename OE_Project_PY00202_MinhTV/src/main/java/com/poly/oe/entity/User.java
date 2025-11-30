@@ -29,4 +29,10 @@ public class User {
 
     @Column(name = "Admin", nullable = false)
     private boolean admin;
+
+    @Column(name = "Active", nullable = false)
+    private boolean active;
+
+    @Column(name = "IsDelete", nullable = false)
+    private boolean isDelete;
 }

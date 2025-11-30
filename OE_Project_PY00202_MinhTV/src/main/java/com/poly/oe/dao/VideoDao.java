@@ -1,7 +1,8 @@
 package com.poly.oe.dao;
 
-import com.poly.oe.entity.Video;
 import java.util.List;
+
+import com.poly.oe.entity.Video;
 
 public interface VideoDao {
 
@@ -25,4 +26,19 @@ public interface VideoDao {
 
     // Xóa video
     void remove(String id);
+
+    // Danh sách video đã xóa (soft-delete), có phân trang
+    List<Video> findDeletedPage(int page, int pageSize);
+
+    // Đếm tổng số video đã xóa
+    long countDeleted();
+
+    // Khôi phục nhiều video theo danh sách id
+    void restoreMany(java.util.List<String> ids);
+
+    // Tìm kiếm video theo từ khóa (title/description), có phân trang
+    List<Video> search(String keyword, int page, int pageSize);
+
+    // Đếm tổng số kết quả tìm kiếm
+    long countSearch(String keyword);
 }

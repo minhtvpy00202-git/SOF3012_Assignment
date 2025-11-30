@@ -1,0 +1,778 @@
+/* ========================================
+   YouTube-Inspired Theme with Dark/Light Mode
+   ======================================== */
+
+/* CSS Variables for Light and Dark Themes */
+:root {
+    /* Light Theme (Default) */
+    --bg-primary: #f9f9f9;
+    --bg-secondary: #ffffff;
+    --bg-hover: #f2f2f2;
+    --text-primary: #030303;
+    --text-secondary: #606060;
+    --border-color: #e5e5e5;
+    --header-bg: #ffffff;
+    --menu-bg: #f9f9f9;
+    --accent-color: #065fd4;
+    --accent-hover: #0448a8;
+    --button-bg: #065fd4;
+    --button-text: #ffffff;
+    --like-button: #065fd4;
+    --share-button: #ff0000;
+    --card-bg: #ffffff;
+    --input-bg: #f1f1f1;
+    --input-border: #cccccc;
+    --sidebar-bg: #f9f9f9;
+    --comment-bg: #f9f9f9;
+    --success-color: #065fd4;
+    --danger-color: #cc0000;
+}
+
+body[data-theme="dark"] {
+    /* Dark Theme */
+    --bg-primary: #0f0f0f;
+    --bg-secondary: #212121;
+    --bg-hover: #3a3a3a;
+    --text-primary: #f1f1f1;
+    --text-secondary: #aaaaaa;
+    --border-color: #3a3a3a;
+    --header-bg: #212121;
+    --menu-bg: #212121;
+    --accent-color: #3ea6ff;
+    --accent-hover: #65b8ff;
+    --button-bg: #3ea6ff;
+    --button-text: #0f0f0f;
+    --like-button: #3ea6ff;
+    --share-button: #ff0000;
+    --card-bg: #212121;
+    --input-bg: #121212;
+    --input-border: #3a3a3a;
+    --sidebar-bg: #212121;
+    --comment-bg: #272727;
+    --success-color: #3ea6ff;
+    --danger-color: #ff4444;
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Roboto", "Arial", sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    margin: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-hover);
+}
+
+/* ========================================
+   HEADER & TOP BAR
+   ======================================== */
+.top-bar {
+    background: var(--header-bg);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.top-bar span:first-child {
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.theme-toggle button {
+    padding: 8px 16px;
+    border-radius: 18px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.theme-toggle button:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-color);
+}
+
+/* ========================================
+   NAVIGATION MENU
+   ======================================== */
+.menu {
+    background: var(--menu-bg);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.menu a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.menu a:hover {
+    background: var(--bg-hover);
+    color: var(--accent-color);
+}
+
+/* Dropdown Menu */
+.menu .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.menu .dropdown .dropdown-toggle {
+    cursor: pointer;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+}
+
+.menu .dropdown .dropdown-toggle:hover {
+    background: var(--bg-hover);
+}
+
+.menu .dropdown-menu {
+    display: none;
+    position: absolute;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    z-index: 100;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.menu .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.menu .dropdown-menu a {
+    display: block;
+    padding: 12px 16px;
+    color: var(--text-primary);
+    font-weight: 400;
+    margin: 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.menu .dropdown-menu a:last-child {
+    border-bottom: none;
+}
+
+.menu .dropdown-menu a:hover {
+    background: var(--bg-hover);
+}
+
+.menu .right {
+    margin-left: auto;
+}
+
+.menu .greet {
+    font-weight: 400;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+/* ========================================
+   SEARCH BAR
+   ======================================== */
+.searchbar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 12px 0;
+}
+
+.searchbar-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.searchbar form {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    gap: 0;
+}
+
+.searchbar input[type="text"] {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1px solid var(--input-border);
+    border-right: none;
+    border-radius: 40px 0 0 40px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+}
+
+.searchbar input[type="text"]:focus {
+    border-color: var(--accent-color);
+}
+
+.searchbar button {
+    padding: 10px 24px;
+    border-radius: 0 40px 40px 0;
+    border: 1px solid var(--input-border);
+    border-left: none;
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.searchbar button:hover {
+    background: var(--bg-primary);
+}
+
+/* ========================================
+   CONTAINER
+   ======================================== */
+.container {
+    max-width: 1280px;
+    margin: 24px auto;
+    background: var(--bg-secondary);
+    padding: 24px;
+    border-radius: 12px;
+    min-height: 400px;
+}
+
+/* ========================================
+   VIDEO GRID (Home & Favorites)
+   ======================================== */
+.home-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+}
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+@media (min-width: 1600px) {
+    .video-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .video-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.video-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+}
+
+.poster-box {
+    position: relative;
+    width: 100%;
+    padding-top: 56.25%; /* 16:9 aspect ratio */
+    background: var(--bg-primary);
+    overflow: hidden;
+    display: block;
+}
+
+.poster-box img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.video-title-bar {
+    padding: 12px;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.btn-row {
+    padding: 0 12px 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-like,
+.btn-unlike,
+.btn-share {
+    flex: 1;
+    border: none;
+    padding: 8px 12px;
+    font-weight: 500;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 18px;
+    transition: all 0.2s ease;
+}
+
+.btn-like {
+    background: var(--like-button);
+    color: var(--button-text);
+}
+
+.btn-like:hover {
+    opacity: 0.9;
+}
+
+.btn-unlike {
+    background: var(--danger-color);
+    color: #ffffff;
+}
+
+.btn-unlike:hover {
+    opacity: 0.9;
+}
+
+.btn-share {
+    background: var(--share-button);
+    color: #ffffff;
+}
+
+.btn-share:hover {
+    opacity: 0.9;
+}
+
+/* ========================================
+   PAGINATION
+   ======================================== */
+.pager {
+    text-align: center;
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.pager button {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.pager button:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-color);
+}
+
+/* ========================================
+   VIDEO DETAIL PAGE
+   ======================================== */
+.detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 24px;
+}
+
+.video-box {
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.video-box iframe {
+    width: 100%;
+    height: 480px;
+    border: none;
+}
+
+.video-box form {
+    width: 100%;
+}
+
+.video-box input[type="text"],
+.video-box textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.detail-title-bar {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 16px 20px;
+    font-weight: 500;
+    font-size: 18px;
+    border-top: 1px solid var(--border-color);
+}
+
+.detail-desc {
+    padding: 16px 20px;
+    background: var(--bg-hover);
+    border-radius: 12px;
+    margin: 16px 20px;
+    line-height: 1.6;
+    font-size: 14px;
+}
+
+.detail-desc p {
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.detail-desc p:first-child {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.detail-desc p:last-child {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.detail-actions {
+    padding: 16px 20px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+}
+
+.detail-actions form,
+.detail-actions a {
+    margin: 0;
+    display: inline-block;
+    width: auto;
+}
+
+.detail-actions .btn-like,
+.detail-actions .btn-share {
+    margin: 0;
+    flex: 0 0 auto;
+}
+
+/* ========================================
+   COMMENTS SECTION
+   ======================================== */
+.comment-form {
+    padding: 20px;
+    background: var(--comment-bg);
+    border-radius: 8px;
+    margin-top: 16px;
+    width: 100%;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 100px;
+    box-sizing: border-box;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.comment-item {
+    padding: 20px;
+    border-top: 1px solid var(--border-color);
+    width: 100%;
+}
+
+.comment-author {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.comment-content {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+    font-size: 14px;
+    word-wrap: break-word;
+}
+
+.comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.comment-reply {
+    margin-left: 48px;
+    padding: 16px;
+    border-left: 2px solid var(--border-color);
+    margin-top: 12px;
+    background: var(--bg-hover);
+    border-radius: 0 8px 8px 0;
+}
+
+/* ========================================
+   SIDEBAR (Recent Videos)
+   ======================================== */
+.sidebar-item {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    background: var(--card-bg);
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+.sidebar-item:hover {
+    background: var(--bg-hover);
+}
+
+.sidebar-poster {
+    width: 120px;
+    height: 68px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-primary);
+}
+
+.sidebar-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.sidebar-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.sidebar-title a {
+    color: var(--text-primary);
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.sidebar-title a:hover {
+    color: var(--accent-color);
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 1024px) {
+    .detail-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-bar {
+        padding: 12px 16px;
+    }
+    
+    .menu {
+        padding: 12px 16px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .searchbar-inner {
+        padding: 0 16px;
+    }
+    
+    .container {
+        margin: 16px;
+        padding: 16px;
+    }
+    
+    .video-grid {
+        gap: 12px;
+    }
+    
+    .video-box iframe {
+        height: 360px;
+    }
+}
+
+@media (max-width: 480px) {
+    .menu {
+        gap: 8px;
+    }
+    
+    .menu a,
+    .menu .dropdown .dropdown-toggle {
+        font-size: 13px;
+        padding: 6px 8px;
+    }
+    
+    .video-box iframe {
+        height: 240px;
+    }
+}
+
+
+/* ========================================
+   ADDITIONAL STYLES FOR BETTER VISIBILITY
+   ======================================== */
+
+/* Ensure form elements in detail page have proper styling */
+.video-box form {
+    display: inline-block;
+}
+
+.video-box input[type="hidden"] {
+    display: none;
+}
+
+/* Better link visibility */
+a.btn-like {
+    display: inline-block;
+    text-decoration: none;
+}
+
+/* Empty state message */
+.container > p {
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Ensure all text is readable */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary);
+}
+
+p {
+    color: var(--text-primary);
+}
+
+/* Form elements consistency */
+input, textarea, select {
+    font-family: inherit;
+}
+
+/* Better focus states for accessibility */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus,
+a:focus {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+/* Smooth transitions */
+* {
+    transition-property: background-color, border-color, color;
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+}
+
+/* Override transitions for specific elements */
+button,
+a,
+.video-card {
+    transition-property: all;
+    transition-duration: 0.2s;
+}
+
+/* Ensure dropdown is always visible */
+.menu .dropdown-menu {
+    z-index: 1000;
+}
+
+/* Better contrast for disabled inputs */
+input:disabled,
+textarea:disabled,
+select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

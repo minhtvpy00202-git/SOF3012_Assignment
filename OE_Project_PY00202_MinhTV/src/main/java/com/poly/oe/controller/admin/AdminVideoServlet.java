@@ -28,6 +28,7 @@ public class AdminVideoServlet extends HttpServlet {
 
         String action = req.getParameter("action");
         String id = req.getParameter("id");
+        String tab = req.getParameter("tab");
 
         // 1. Chuẩn bị form: chế độ tạo mới hoặc edit
         if ("edit".equals(action) && id != null && !id.isBlank()) {
@@ -38,8 +39,12 @@ public class AdminVideoServlet extends HttpServlet {
             prepareCreateForm(req);
         }
 
-        // 2. Load danh sách video (10 video / trang)
-        loadVideoList(req);
+        // 2. Load danh sách video theo tab
+        if ("deleted".equals(tab)) {
+            loadDeletedVideoList(req);
+        } else {
+            loadVideoList(req);
+        }
 
         req.setAttribute("view", "/views/admin/videos.jsp");
         req.getRequestDispatcher("/views/layout/admin.jsp").forward(req, resp);
@@ -103,6 +108,21 @@ public class AdminVideoServlet extends HttpServlet {
                 // Sau khi xóa -> quay về form tạo mới
                 prepareCreateForm(req);
 
+            } else if ("restore".equals(action)) {
+                // ===== KHÔI PHỤC VIDEO =====
+                String[] ids = req.getParameterValues("ids");
+                java.util.List<String> list = new java.util.ArrayList<>();
+                if (ids != null) {
+                    for (String s : ids) {
+                        if (s != null && !s.isBlank()) list.add(s);
+                    }
+                }
+                videoDao.restoreMany(list);
+                req.setAttribute("message", "Đã khôi phục " + list.size() + " video");
+                // quay về tab deleted
+                req.setAttribute("activeTab", "deleted");
+                loadDeletedVideoList(req);
+
             } else if ("reset".equals(action)) {
 
                 // ===== RESET FORM -> tạo mới ID =====
@@ -115,8 +135,13 @@ public class AdminVideoServlet extends HttpServlet {
             // lỗi thì vẫn giữ form hiện tại, không đụng tới editing flag nếu đã set
         }
 
-        // Luôn load lại danh sách video & forward về JSP
-        loadVideoList(req);
+        // Luôn load lại danh sách theo tab
+        String tab = req.getParameter("tab");
+        if ("deleted".equals(tab) || "restore".equals(action)) {
+            loadDeletedVideoList(req);
+        } else {
+            loadVideoList(req);
+        }
         req.setAttribute("view", "/views/admin/videos.jsp");
         req.getRequestDispatcher("/views/layout/admin.jsp").forward(req, resp);
     }
@@ -134,6 +159,18 @@ public class AdminVideoServlet extends HttpServlet {
         req.setAttribute("videos", list);
         req.setAttribute("currentPage", page);
         req.setAttribute("totalPage", totalPage);
+    }
+
+    private void loadDeletedVideoList(HttpServletRequest req) {
+        int page = parseInt(req.getParameter("page"), 1);
+        int pageSize = 10;
+        java.util.List<Video> list = videoDao.findDeletedPage(page, pageSize);
+        long total = videoDao.countDeleted();
+        long totalPage = (long) Math.ceil(total * 1.0 / pageSize);
+
+        req.setAttribute("deletedVideos", list);
+        req.setAttribute("deletedCurrentPage", page);
+        req.setAttribute("deletedTotalPage", totalPage);
     }
 
     /** Chuẩn bị form ở chế độ tạo mới: sinh Video ID mới, views = 0, active = true */

@@ -17,7 +17,7 @@ import java.io.IOException;
         "/video/share",
         "/share/*",
         "/account/*",
-        "/admin/*"       // toàn bộ trang admin
+        "/admin/*"
 })
 public class AuthFilter implements Filter {
 
@@ -36,6 +36,19 @@ public class AuthFilter implements Filter {
         String uri = req.getRequestURI();
 
         boolean adminPath = uri.startsWith(contextPath + "/admin");
+
+        // Cho phép truy cập không cần đăng nhập đối với các trang công khai
+        String[] publicPaths = new String[]{
+                contextPath + "/login",
+                contextPath + "/account/registration",
+                contextPath + "/account/forgot-password"
+        };
+        for (String p : publicPaths) {
+            if (uri.startsWith(p)) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
 
         if (user == null) {
             // lưu URL để sau login quay lại

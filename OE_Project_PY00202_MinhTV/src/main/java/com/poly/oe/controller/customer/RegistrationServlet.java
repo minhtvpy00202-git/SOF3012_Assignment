@@ -1,15 +1,16 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
+
+import java.io.IOException;
 
 import com.poly.oe.dao.UserDao;
 import com.poly.oe.dao.impl.UserDaoImpl;
 import com.poly.oe.entity.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
 
 @WebServlet("/account/registration")
 public class RegistrationServlet extends HttpServlet {
@@ -20,6 +21,7 @@ public class RegistrationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        req.setAttribute("hideSearch", true);
         req.setAttribute("view", "/views/account/registration.jsp");
         req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
     }
@@ -36,7 +38,6 @@ public class RegistrationServlet extends HttpServlet {
         String email    = req.getParameter("email");
 
         try {
-            // validate rất cơ bản
             if (username == null || username.isBlank()
                     || password == null || password.isBlank()
                     || email == null || email.isBlank()) {
@@ -49,11 +50,10 @@ public class RegistrationServlet extends HttpServlet {
                 u.setPassword(password);
                 u.setFullname(fullname);
                 u.setEmail(email);
-                u.setAdmin(false); // đăng ký mới luôn là user thường
+                u.setAdmin(false);
+                u.setActive(false);
 
                 userDao.create(u);
-
-                // TODO: Gửi email chào mừng (khi em cấu hình JavaMail)
 
                 req.setAttribute("message", "Đăng ký thành công. Hãy đăng nhập!");
             }
@@ -62,6 +62,7 @@ public class RegistrationServlet extends HttpServlet {
             req.setAttribute("message", "Lỗi: " + e.getMessage());
         }
 
+        req.setAttribute("hideSearch", true);
         req.setAttribute("view", "/views/account/registration.jsp");
         req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
     }

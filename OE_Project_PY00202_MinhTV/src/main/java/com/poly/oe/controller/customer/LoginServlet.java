@@ -1,8 +1,11 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
+
+import java.io.IOException;
 
 import com.poly.oe.dao.UserDao;
 import com.poly.oe.dao.impl.UserDaoImpl;
 import com.poly.oe.entity.User;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.Cookie;
@@ -10,8 +13,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import java.io.IOException;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -22,6 +23,7 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        req.setAttribute("hideSearch", true);
         req.setAttribute("view", "/views/account/login.jsp");
         req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
     }
@@ -38,17 +40,24 @@ public class LoginServlet extends HttpServlet {
 
         if (user == null) {
             req.setAttribute("message", "Sai tên đăng nhập hoặc mật khẩu");
+            req.setAttribute("hideSearch", true);
             req.setAttribute("view", "/views/account/login.jsp");
             req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
             return;
         }
 
-        // Ghi vào session
+        if (!user.isActive()) {
+            req.setAttribute("message", "Tài khoản chưa được duyệt, vui lòng chờ đến khi tài khoản được duyệt");
+            req.setAttribute("hideSearch", true);
+            req.setAttribute("view", "/views/account/login.jsp");
+            req.getRequestDispatcher("/views/layout/customer.jsp").forward(req, resp);
+            return;
+        }
+
         HttpSession session = req.getSession();
         session.setAttribute("currentUser", user);
 
-        // Remember me (ghi cookie username + password theo đúng đề bài)
-        int maxAge = (remember != null) ? 60 * 60 * 24 * 30 : 0; // 30 ngày hoặc xóa
+        int maxAge = (remember != null) ? 60 * 60 * 24 * 30 : 0;
         Cookie userCookie = new Cookie("username", username);
         Cookie passCookie = new Cookie("password", password);
         userCookie.setMaxAge(maxAge);
@@ -58,7 +67,6 @@ public class LoginServlet extends HttpServlet {
         resp.addCookie(userCookie);
         resp.addCookie(passCookie);
 
-        // Nếu có URL yêu cầu bảo mật trước đó thì quay lại
         String redirectUrl = (String) session.getAttribute("redirectUrl");
         if (redirectUrl != null) {
             session.removeAttribute("redirectUrl");
@@ -66,7 +74,6 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Nếu user là admin -> sang trang admin, ngược lại -> home
         if (user.isAdmin()) {
             resp.sendRedirect(req.getContextPath() + "/admin/home");
         } else {

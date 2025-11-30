@@ -1,4 +1,7 @@
-package com.poly.oe.controller;
+package com.poly.oe.controller.customer;
+
+import java.io.IOException;
+import java.util.Date;
 
 import com.poly.oe.dao.FavoriteDao;
 import com.poly.oe.dao.VideoDao;
@@ -7,15 +10,13 @@ import com.poly.oe.dao.impl.VideoDaoImpl;
 import com.poly.oe.entity.Favorite;
 import com.poly.oe.entity.User;
 import com.poly.oe.entity.Video;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
-import java.io.IOException;
-import java.util.Date;
 
 @WebServlet("/video/like")
 public class VideoLikeServlet extends HttpServlet {
@@ -26,11 +27,27 @@ public class VideoLikeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+        handleLike(req, resp);
+    }
 
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        handleLike(req, resp);
+    }
+
+    private void handleLike(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession session = req.getSession(false);
-        User user = (User) session.getAttribute("currentUser");
+        User user = session != null ? (User) session.getAttribute("currentUser") : null;
+        if (user == null) {
+            resp.sendRedirect(req.getContextPath() + "/login");
+            return;
+        }
 
-        String videoId = req.getParameter("id");
+        String videoId = req.getParameter("videoId");
+        if (videoId == null || videoId.isBlank()) {
+            videoId = req.getParameter("id");
+        }
         if (videoId == null || videoId.isBlank()) {
             resp.sendRedirect(req.getContextPath() + "/home");
             return;
@@ -42,7 +59,6 @@ public class VideoLikeServlet extends HttpServlet {
             return;
         }
 
-        // Nếu chưa like thì tạo Favorite
         Favorite f = favoriteDao.findByUserAndVideo(user.getId(), videoId);
         if (f == null) {
             f = new Favorite();
@@ -52,7 +68,6 @@ public class VideoLikeServlet extends HttpServlet {
             favoriteDao.create(f);
         }
 
-        // Quay lại trang trước (home/detail/..)
         String referer = req.getHeader("referer");
         if (referer == null) {
             referer = req.getContextPath() + "/home";

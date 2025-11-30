@@ -34,4 +34,7 @@ public class Video {
 
     @Column(name = "Href")       // ← THÊM DÒNG NÀY
     private String href;
+
+    @Column(name = "IsDelete", nullable = false)
+    private boolean isDelete;
 }
