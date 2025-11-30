@@ -1,11 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<div class="home-title">Kết quả tìm kiếm cho "${q}"</div>
+<div class="home-title"><fmt:message key="search.resultsTitle"><fmt:param value="${q}"/></fmt:message></div>
 
 <c:choose>
     <c:when test="${empty videos}">
-        <div>Không tìm thấy kết quả nào.</div>
+        <div><fmt:message key="search.noResults"/></div>
     </c:when>
     <c:otherwise>
         <div class="video-grid">
@@ -19,7 +20,7 @@
                     <div>
                         <form action="${pageContext.request.contextPath}/video/share" method="get" style="display:inline;">
                             <input type="hidden" name="videoId" value="${v.id}" />
-                            <button class="btn-share" type="submit">Share</button>
+                            <button class="btn-share" type="submit"><fmt:message key="action.share"/></button>
                         </form>
                     </div>
                 </div>

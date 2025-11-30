@@ -359,6 +359,12 @@ a:hover {
     overflow: hidden;
 }
 
+.video-views {
+    color: var(--text-secondary);
+    font-weight: 400;
+    margin-left: 6px;
+}
+
 .btn-row {
     padding: 0 12px 12px;
     display: flex;
@@ -588,6 +594,26 @@ a:hover {
     margin-top: 12px;
     background: var(--bg-hover);
     border-radius: 0 8px 8px 0;
+}
+
+/* Replies toggle */
+.comment-replies-toggle {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.replies-toggle {
+    color: var(--accent-color);
+    cursor: pointer;
+}
+
+.replies-toggle:hover {
+    text-decoration: underline;
+}
+
+.replies-box {
+    margin-left: 48px;
+    margin-top: 8px;
 }
 
 /* ========================================

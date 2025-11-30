@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -11,16 +12,25 @@
 </head>
 <body data-theme="light">
 
+<c:if test="${not empty param.lang}">
+    <c:set var="siteLang" value="${param.lang}" scope="session" />
+    </c:if>
+<fmt:setLocale value="${sessionScope.siteLang != null ? sessionScope.siteLang : 'vi'}" scope="request" />
+<fmt:setBundle basename="messages" scope="request" />
+
 <div class="top-bar">
-    <span>OE Online Entertainment</span>
+    <span><fmt:message key="app.title"/></span>
     <div class="theme-toggle">
         <button id="themeToggle" type="button">🌙 Dark</button>
+    </div>
+    <div class="lang-switch">
+        <a href="#" data-lang="en">EN</a> | <a href="#" data-lang="vi">VI</a>
     </div>
 </div>
 
 <div class="menu">
-    <a href="${pageContext.request.contextPath}/home">Home Page</a>
-    <a href="${pageContext.request.contextPath}/my-favorites">My Favorites</a>
+    <a href="${pageContext.request.contextPath}/home"><fmt:message key="menu.home"/></a>
+    <a href="${pageContext.request.contextPath}/my-favorites"><fmt:message key="menu.favorites"/></a>
 
     
 
@@ -29,29 +39,29 @@
         <c:when test="${not empty sessionScope.currentUser}">
             <!-- đã login -->
             <c:if test="${sessionScope.currentUser.admin}">
-                <a href="${pageContext.request.contextPath}/admin/home">Admin Dashboard</a>
+                <a href="${pageContext.request.contextPath}/admin/home"><fmt:message key="menu.adminDashboard"/></a>
             </c:if>
             <span class="dropdown">
-                <span class="dropdown-toggle">My Account</span>
+                <span class="dropdown-toggle"><fmt:message key="menu.account"/></span>
                 <div class="dropdown-menu">
-                    <a href="${pageContext.request.contextPath}/account/edit-profile">Edit Profile</a>
-                    <a href="${pageContext.request.contextPath}/account/change-password">Change Password</a>
-                    <a href="${pageContext.request.contextPath}/account/logoff">Logoff</a>
+                    <a href="${pageContext.request.contextPath}/account/edit-profile"><fmt:message key="account.editProfile"/></a>
+                    <a href="${pageContext.request.contextPath}/account/change-password"><fmt:message key="account.changePassword"/></a>
+                    <a href="${pageContext.request.contextPath}/account/logoff"><fmt:message key="account.logoff"/></a>
                 </div>
             </span>
-            <span class="right greet">Hello, ${sessionScope.currentUser.fullname != null && sessionScope.currentUser.fullname != '' ? sessionScope.currentUser.fullname : sessionScope.currentUser.id}</span>
+            <span class="right greet"><fmt:message key="greet.loggedInPrefix"/> ${sessionScope.currentUser.fullname != null && sessionScope.currentUser.fullname != '' ? sessionScope.currentUser.fullname : sessionScope.currentUser.id}</span>
         </c:when>
         <c:otherwise>
             <!-- chưa login -->
             <span class="dropdown">
-                <span class="dropdown-toggle">Account</span>
+                <span class="dropdown-toggle"><fmt:message key="menu.account"/></span>
                 <div class="dropdown-menu">
-                    <a href="${pageContext.request.contextPath}/login">Login</a>
-                    <a href="${pageContext.request.contextPath}/account/forgot-password">Forgot Password</a>
-                    <a href="${pageContext.request.contextPath}/account/registration">Registration</a>
+                    <a href="${pageContext.request.contextPath}/login"><fmt:message key="account.login"/></a>
+                    <a href="${pageContext.request.contextPath}/account/forgot-password"><fmt:message key="account.forgotPassword"/></a>
+                    <a href="${pageContext.request.contextPath}/account/registration"><fmt:message key="account.registration"/></a>
                 </div>
             </span>
-            <span class="right greet">Hello, Guest</span>
+            <span class="right greet"><fmt:message key="greet.guest"/></span>
         </c:otherwise>
     </c:choose>
 </div>
@@ -60,8 +70,8 @@
     <div class="searchbar">
         <div class="searchbar-inner">
             <form action="${pageContext.request.contextPath}/search" method="get">
-                <input type="text" name="q" value="${fn:escapeXml(param.q)}" placeholder="Search videos..." />
-                <button type="submit">Search</button>
+                <input type="text" name="q" value="${fn:escapeXml(param.q)}" placeholder="<fmt:message key='search.placeholder'/>" />
+                <button type="submit"><fmt:message key="search.button"/></button>
             </form>
         </div>
     </div>
@@ -90,6 +100,18 @@
                 localStorage.setItem('theme', nt); 
                 btn.textContent = nt === 'dark' ? '☀️ Light' : '🌙 Dark';
             }); 
+        }
+        var ls = document.querySelector('.lang-switch');
+        if(ls){
+            ls.addEventListener('click', function(e){
+                var a = e.target.closest('a[data-lang]');
+                if(!a) return;
+                e.preventDefault();
+                var lang = a.getAttribute('data-lang');
+                var url = new URL(window.location.href);
+                url.searchParams.set('lang', lang);
+                window.location.assign(url.toString());
+            });
         }
     })();
 </script>

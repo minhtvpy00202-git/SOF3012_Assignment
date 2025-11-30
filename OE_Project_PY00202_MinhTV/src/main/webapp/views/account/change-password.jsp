@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <style>
     .account-form-container {
@@ -85,7 +86,7 @@
 </style>
 
 <div class="account-form-container">
-    <h2 class="account-form-title">Change Password</h2>
+    <h2 class="account-form-title"><fmt:message key="account.changePassword"/></h2>
 
     <c:if test="${not empty message}">
         <div class="account-form-message error">${message}</div>
@@ -93,22 +94,22 @@
 
     <form method="post">
         <div class="account-form-row">
-            <label>Username</label>
+            <label><fmt:message key="login.username"/></label>
             <input type="text" name="username" value="${sessionScope.currentUser.id}" readonly>
         </div>
         <div class="account-form-row">
-            <label>Current Password</label>
+            <label><fmt:message key="change.currentPassword"/></label>
             <input type="password" name="currentPassword" placeholder="Enter current password">
         </div>
         <div class="account-form-row">
-            <label>New Password</label>
+            <label><fmt:message key="change.newPassword"/></label>
             <input type="password" name="newPassword" placeholder="Enter new password">
         </div>
         <div class="account-form-row">
-            <label>Confirm New Password</label>
+            <label><fmt:message key="change.confirmNew"/></label>
             <input type="password" name="confirm" placeholder="Confirm new password">
         </div>
 
-        <button class="account-form-submit" type="submit">Change Password</button>
+        <button class="account-form-submit" type="submit"><fmt:message key="account.changePassword"/></button>
     </form>
 </div>

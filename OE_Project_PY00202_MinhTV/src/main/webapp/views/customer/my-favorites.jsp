@@ -1,10 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
-<div class="home-title">My Favorites</div>
+<div class="home-title"><fmt:message key="menu.favorites"/></div>
 
 <c:if test="${empty favorites}">
-    <p>Bạn chưa thích tiểu phẩm nào.</p>
+    <p><fmt:message key="favorites.empty"/></p>
 </c:if>
 
 <div class="video-grid">
@@ -19,6 +20,7 @@
 
             <div class="video-title-bar">
                 ${v.title}
+                <span class="video-views">(<fmt:message key="table.views"/> ${v.views})</span>
             </div>
 
             <div class="btn-row">
@@ -26,14 +28,14 @@
                 <form action="${pageContext.request.contextPath}/video/unlike"
                       method="post" style="display:inline;">
                     <input type="hidden" name="videoId" value="${v.id}">
-                    <button type="submit" class="btn-unlike">Unlike</button>
+                    <button type="submit" class="btn-unlike"><fmt:message key="action.unlike"/></button>
                 </form>
 
                 <!-- Share -->
                 <form action="${pageContext.request.contextPath}/share"
                       method="get" style="display:inline;">
                     <input type="hidden" name="videoId" value="${v.id}">
-                    <button type="submit" class="btn-share">Share</button>
+                    <button type="submit" class="btn-share"><fmt:message key="action.share"/></button>
                 </form>
             </div>
         </div>

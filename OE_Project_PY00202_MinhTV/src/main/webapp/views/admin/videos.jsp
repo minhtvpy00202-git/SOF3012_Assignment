@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -176,7 +177,7 @@
     }
 </style>
 
-<h1 class="admin-title">VIDEO MANAGEMENT</h1>
+<h1 class="admin-title"><fmt:message key="admin.videos.title"/></h1>
 
 <div class="video-admin-wrapper">
 
@@ -184,15 +185,15 @@
     <div class="video-admin-tabs">
         <a class="video-admin-tab ${activeTab == 'edit' ? 'active' : ''}"
            href="${ctx}/admin/videos?tab=edit">
-            VIDEO EDITION
+            <fmt:message key="admin.videos.tab.edit"/>
         </a>
         <a class="video-admin-tab ${activeTab == 'list' ? 'active' : ''}"
            href="${ctx}/admin/videos?tab=list">
-            VIDEO LIST
+            <fmt:message key="admin.videos.tab.list"/>
         </a>
         <a class="video-admin-tab ${activeTab == 'deleted' ? 'active' : ''}"
            href="${ctx}/admin/videos?tab=deleted">
-            DELETED LIST
+            <fmt:message key="admin.videos.tab.deleted"/>
         </a>
     </div>
 
@@ -229,7 +230,7 @@
                         </div>
 
                         <div class="admin-form-row">
-                            <label>Chọn poster?</label>
+                            <label><fmt:message key="admin.videos.choosePoster"/></label>
                             <input type="file" name="posterFile" accept="image/*"/>
                         </div>
                     </div>
@@ -238,40 +239,40 @@
                     <!-- form fields -->
                     <div class="video-form-panel">
                         <div class="admin-form-row">
-                            <label>Youtube ID?</label>
+                            <label><fmt:message key="admin.videos.field.id"/></label>
                             <input type="text" name="id" value="${form.id}"/>
                         </div>
 
                         <div class="admin-form-row">
-                            <label>Video Title?</label>
+                            <label><fmt:message key="admin.videos.field.title"/></label>
                             <input type="text" name="title" value="${form.title}"/>
                         </div>
 
                         <div class="admin-form-row">
-                            <label>View Count?</label>
+                            <label><fmt:message key="admin.videos.field.views"/></label>
                             <input type="number" name="views"
                                    value="${form.views != null ? form.views : 0}"/>
                         </div>
 
                         <div class="admin-form-row">
-                            <label>Status</label>
+                            <label><fmt:message key="table.status"/></label>
                             <label>
                                 <input type="radio" name="active" value="true"
-                                       ${form.active ? "checked" : ""}/> Active
+                                       ${form.active ? "checked" : ""}/> <fmt:message key="status.active"/>
                             </label>
                             <label style="margin-left:15px;">
                                 <input type="radio" name="active" value="false"
-                                       ${!form.active ? "checked" : ""}/> Inactive
+                                       ${!form.active ? "checked" : ""}/> <fmt:message key="status.inactive"/>
                             </label>
                         </div>
 
                         <div class="admin-form-row">
-                            <label>Youtube href?</label>
+                            <label><fmt:message key="admin.videos.field.href"/></label>
                             <input type="text" name="href" value="${form.href}"/>
                         </div>
 
                         <div class="admin-form-row">
-                            <label>Description?</label>
+                            <label><fmt:message key="admin.videos.field.description"/></label>
                             <textarea name="description" rows="4">${form.description}</textarea>
                         </div>
 
@@ -280,27 +281,27 @@
                             <button class="btn-orange" type="submit"
                                     onclick="document.getElementById('actionField').value='create'"
                                     <c:if test="${editing}">disabled</c:if>>
-                                Create
+                                <fmt:message key="action.create"/>
                             </button>
 
                             <!-- Update -->
                             <button class="btn-orange" type="submit"
                                     onclick="document.getElementById('actionField').value='update'"
                                     <c:if test="${not editing}">disabled</c:if>>
-                                Update
+                                <fmt:message key="action.update"/>
                             </button>
 
                             <!-- Delete -->
                             <button class="btn-orange" type="submit"
                                     onclick="document.getElementById('actionField').value='delete'"
                                     <c:if test="${not editing}">disabled</c:if>>
-                                Delete
+                                <fmt:message key="action.delete"/>
                             </button>
 
                             <!-- Reset -->
                             <button class="btn-orange" type="submit"
                                     onclick="document.getElementById('actionField').value='reset'">
-                                Reset
+                                <fmt:message key="action.reset"/>
                             </button>
                         </div>
                     </div>
@@ -337,16 +338,16 @@
 
         <!-- TAB 2: LIST -->
         <div class="video-tab-pane ${activeTab == 'list' ? 'active' : ''}" id="tab-list">
-            <h2 class="admin-subtitle">VIDEO LIST</h2>
+            <h2 class="admin-subtitle"><fmt:message key="admin.videos.tab.list"/></h2>
 
             <table class="admin-table">
                 <thead>
                 <tr>
-                    <th>Youtube Id</th>
-                    <th>Video Title</th>
-                    <th>View Count</th>
-                    <th>Status</th>
-                    <th>Edit</th>
+                    <th><fmt:message key="admin.videos.field.id"/></th>
+                    <th><fmt:message key="admin.videos.field.title"/></th>
+                    <th><fmt:message key="admin.videos.field.views"/></th>
+                    <th><fmt:message key="table.status"/></th>
+                    <th><fmt:message key="table.edit"/></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -357,13 +358,13 @@
                         <td>${v.views}</td>
                         <td>
                             <c:choose>
-                                <c:when test="${v.active}">Active</c:when>
-                                <c:otherwise>Inactive</c:otherwise>
+                                <c:when test="${v.active}"><fmt:message key="status.active"/></c:when>
+                                <c:otherwise><fmt:message key="status.inactive"/></c:otherwise>
                             </c:choose>
                         </td>
                         <td>
                             <a href="${ctx}/admin/videos?action=edit&id=${v.id}&tab=edit">
-                                Edit
+                                <fmt:message key="table.edit"/>
                             </a>
                         </td>
                     </tr>
@@ -384,7 +385,7 @@
 
         <!-- TAB 3: DELETED LIST -->
         <div class="video-tab-pane ${activeTab == 'deleted' ? 'active' : ''}" id="tab-deleted">
-            <h2 class="admin-subtitle">DELETED VIDEOS</h2>
+            <h2 class="admin-subtitle"><fmt:message key="admin.videos.tab.deleted"/></h2>
 
             <form action="${ctx}/admin/videos" method="post">
                 <input type="hidden" name="action" value="restore" />
@@ -394,9 +395,9 @@
                     <thead>
                     <tr>
                         <th style="width:32px"><input type="checkbox" onclick="document.querySelectorAll('#tab-deleted input[type=checkbox].rowchk').forEach(cb=>cb.checked=this.checked)"></th>
-                        <th>Youtube Id</th>
-                        <th>Video Title</th>
-                        <th>View Count</th>
+                        <th><fmt:message key="admin.videos.field.id"/></th>
+                        <th><fmt:message key="admin.videos.field.title"/></th>
+                        <th><fmt:message key="admin.videos.field.views"/></th>
                     </tr>
                     </thead>
                     <tbody>

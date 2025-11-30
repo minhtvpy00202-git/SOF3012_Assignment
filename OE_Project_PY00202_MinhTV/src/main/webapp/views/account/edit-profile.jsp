@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <style>
     .account-form-container {
@@ -85,7 +86,7 @@
 </style>
 
 <div class="account-form-container">
-    <h2 class="account-form-title">Edit Profile</h2>
+    <h2 class="account-form-title"><fmt:message key="account.editProfile"/></h2>
 
     <c:if test="${not empty message}">
         <div class="account-form-message error">${message}</div>
@@ -93,21 +94,21 @@
 
     <form method="post">
         <div class="account-form-row">
-            <label>Username</label>
+            <label><fmt:message key="login.username"/></label>
             <input type="text" value="${sessionScope.currentUser.id}" readonly>
         </div>
         <div class="account-form-row">
-            <label>Password</label>
+            <label><fmt:message key="login.password"/></label>
             <input type="password" value="••••••••" readonly>
         </div>
         <div class="account-form-row">
-            <label>Full Name</label>
+            <label><fmt:message key="account.fullname"/></label>
             <input type="text" name="fullname" value="${sessionScope.currentUser.fullname}" placeholder="Enter your full name">
         </div>
         <div class="account-form-row">
-            <label>Email Address</label>
+            <label><fmt:message key="account.email"/></label>
             <input type="email" name="email" value="${sessionScope.currentUser.email}" placeholder="Enter your email">
         </div>
-        <button class="account-form-submit" type="submit">Update Profile</button>
+        <button class="account-form-submit" type="submit"><fmt:message key="account.updateProfile"/></button>
     </form>
 </div>

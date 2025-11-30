@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <div class="detail-layout">
 
@@ -15,9 +17,9 @@
             </div>
 
             <div class="detail-desc">
-                <h2>Description</h2>
+                <h2><fmt:message key="detail.description"/></h2>
                 <p>${video.description}</p>
-                <p>Lượt xem: ${video.views}</p>
+                <p><fmt:message key="detail.views"/> ${video.views}</p>
             </div>
 
             <div class="detail-actions">
@@ -27,30 +29,30 @@
                             <c:when test="${videoLikedByMe}">
                                 <form action="${pageContext.request.contextPath}/video/unlike" method="post" style="display:inline;">
                                     <input type="hidden" name="videoId" value="${video.id}">
-                                    <button class="btn-like">Unlike</button>
+                                    <button class="btn-like"><fmt:message key="action.unlike"/></button>
                                 </form>
                             </c:when>
                             <c:otherwise>
                                 <form action="${pageContext.request.contextPath}/video/like" method="post" style="display:inline;">
                                     <input type="hidden" name="videoId" value="${video.id}">
-                                    <button class="btn-like">Like</button>
+                                    <button class="btn-like"><fmt:message key="action.like"/></button>
                                 </form>
                             </c:otherwise>
                         </c:choose>
                     </c:when>
                     <c:otherwise>
-                        <a class="btn-like" href="${pageContext.request.contextPath}/login">Like</a>
+                        <a class="btn-like" href="${pageContext.request.contextPath}/login"><fmt:message key="action.like"/></a>
                     </c:otherwise>
                 </c:choose>
 
                 <form action="${pageContext.request.contextPath}/video/share" method="get" style="display:inline;">
                     <input type="hidden" name="videoId" value="${video.id}">
-                    <button class="btn-share">Share</button>
+                    <button class="btn-share"><fmt:message key="action.share"/></button>
                 </form>
             </div>
 
             <!-- BÌNH LUẬN -->
-            <div class="detail-title-bar" style="margin-top:16px;">COMMENTS</div>
+            <div class="detail-title-bar" style="margin-top:16px;"><fmt:message key="detail.comments"/></div>
 
             <div class="comment-form" style="padding: 20px; background: var(--comment-bg); border-radius: 8px; margin-top: 16px;">
                 <c:choose>
@@ -61,12 +63,12 @@
                                 <textarea name="content" rows="4" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-family: inherit; font-size: 14px; resize: vertical; box-sizing: border-box;"></textarea>
                             </div>
                             <div style="text-align:right; margin-top:12px;">
-                                <button class="btn-share" type="submit">Post Comment</button>
+                                <button class="btn-share" type="submit"><fmt:message key="comment.post"/></button>
                             </div>
                         </form>
                     </c:when>
                     <c:otherwise>
-                        <div>Hãy <a href="${pageContext.request.contextPath}/login">đăng nhập</a> để bình luận.</div>
+                        <div><fmt:message key="comment.loginToComment"/></div>
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -94,46 +96,61 @@
                         <span>${commentLikeCounts[cmt.id]} likes</span>
                     </div>
 
+                    <c:set var="repCount" value="${fn:length(cmt.replies)}" />
+                    <c:if test="${repCount > 0}">
+                        <fmt:message key="replies.countTemplate" var="repTpl"/>
+                        <c:set var="repText" value="${fn:replace(repTpl, '{COUNT}', repCount)}" />
+                        <div class="comment-replies-toggle">
+                            <a href="#" class="replies-toggle"
+                               data-target="replies-${cmt.id}"
+                               data-count="${repCount}"
+                               data-hide-text="<fmt:message key='replies.hide'/>"
+                               data-count-template="${repTpl}">${repText}</a>
+                        </div>
+                    </c:if>
+
                     <!-- form trả lời -->
                     <c:if test="${not empty sessionScope.currentUser}">
                         <div style="margin-top:12px; width: 100%;">
                             <form action="${pageContext.request.contextPath}/comment/reply" method="post" style="width: 100%;">
                                 <input type="hidden" name="parentId" value="${cmt.id}" />
                                 <div style="width: 100%;">
-                                    <input type="text" name="content" style="width:100%; padding:10px; box-sizing:border-box; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg); color:var(--text-primary); font-size: 14px;" placeholder="Viết phản hồi..." />
+                                    <input type="text" name="content" style="width:100%; padding:10px; box-sizing:border-box; border:1px solid var(--border-color); border-radius:8px; background:var(--input-bg); color:var(--text-primary); font-size: 14px;" placeholder="<fmt:message key='reply.placeholder'/>" />
                                 </div>
                                 <div style="text-align:right; margin-top:8px;">
-                                    <button class="btn-share" type="submit">Reply</button>
+                                    <button class="btn-share" type="submit"><fmt:message key="comment.reply"/></button>
                                 </div>
                             </form>
                         </div>
                     </c:if>
 
-                    <!-- danh sách trả lời -->
-                    <c:forEach var="rep" items="${cmt.replies}">
-                        <div class="comment-reply">
-                            <div class="comment-author">
-                                <c:choose>
-                                    <c:when test="${not empty rep.user.fullname}">${rep.user.fullname}</c:when>
-                                    <c:otherwise>${rep.user.id}</c:otherwise>
-                                </c:choose>
+                    <!-- danh sách trả lời (ẩn mặc định, bấm để hiện) -->
+                    <div id="replies-${cmt.id}" class="replies-box" style="display:none;">
+                        <c:forEach var="rep" items="${cmt.replies}">
+                            <div class="comment-reply">
+                                <div class="comment-author">
+                                    <c:choose>
+                                        <c:when test="${not empty rep.user.fullname}">${rep.user.fullname}</c:when>
+                                        <c:otherwise>${rep.user.id}</c:otherwise>
+                                    </c:choose>
+                                </div>
+                                <div class="comment-content">${rep.content}</div>
+                                <div class="comment-actions">
+                                    <form action="${pageContext.request.contextPath}/comment/like" method="post" style="display:inline;">
+                                        <input type="hidden" name="commentId" value="${rep.id}" />
+                                        <input type="hidden" name="videoId" value="${video.id}" />
+                                        <button class="btn-like" type="submit" style="padding:4px 12px; font-size:12px;">
+                                            <c:choose>
+                                                <c:when test="${commentLikedByMe[rep.id]}">Unlike</c:when>
+                                                <c:otherwise>Like</c:otherwise>
+                                            </c:choose>
+                                        </button>
+                                    </form>
+                                    <span>${commentLikeCounts[rep.id]} likes</span>
+                                </div>
                             </div>
-                            <div class="comment-content">${rep.content}</div>
-                            <div class="comment-actions">
-                                <form action="${pageContext.request.contextPath}/comment/like" method="post" style="display:inline;">
-                                    <input type="hidden" name="commentId" value="${rep.id}" />
-                                    <input type="hidden" name="videoId" value="${video.id}" />
-                                    <button class="btn-like" type="submit" style="padding:4px 12px; font-size:12px;">
-                                        <c:choose>
-                                            <c:when test="${commentLikedByMe[rep.id]}">Unlike</c:when>
-                                            <c:otherwise>Like</c:otherwise>
-                                        </c:choose>
-                                    </button>
-                                </form>
-                                <span>${commentLikeCounts[rep.id]} likes</span>
-                            </div>
-                        </div>
-                    </c:forEach>
+                        </c:forEach>
+                    </div>
                 </div>
             </c:forEach>
 
@@ -159,3 +176,24 @@
     </div>
 
 </div>
+
+<script>
+    (function(){
+        document.addEventListener('click', function(e){
+            var t = e.target;
+            if(t && t.classList && t.classList.contains('replies-toggle')){
+                e.preventDefault();
+                var targetId = t.getAttribute('data-target');
+                var box = document.getElementById(targetId);
+                if(box){
+                    var isHidden = box.style.display === 'none' || box.style.display === '';
+                    box.style.display = isHidden ? 'block' : 'none';
+                    var count = t.getAttribute('data-count');
+                    var hideText = t.getAttribute('data-hide-text') || 'Hide replies';
+                    var tpl = t.getAttribute('data-count-template') || '{COUNT} replies';
+                    t.textContent = isHidden ? hideText : tpl.replace('{COUNT}', count);
+                }
+            }
+        });
+    })();
+</script>
