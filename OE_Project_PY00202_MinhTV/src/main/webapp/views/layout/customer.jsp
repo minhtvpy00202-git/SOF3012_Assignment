@@ -49,7 +49,7 @@
                     <a href="${pageContext.request.contextPath}/account/logoff"><fmt:message key="account.logoff"/></a>
                 </div>
             </span>
-            <span class="right greet"><fmt:message key="greet.loggedInPrefix"/> ${sessionScope.currentUser.fullname != null && sessionScope.currentUser.fullname != '' ? sessionScope.currentUser.fullname : sessionScope.currentUser.id}</span>
+            <span class="right greet"><fmt:message key="greet.loggedInPrefix"/> <b style="color: red;"> ${sessionScope.currentUser.fullname != null && sessionScope.currentUser.fullname != '' ? sessionScope.currentUser.fullname : sessionScope.currentUser.id} </b></span>
         </c:when>
         <c:otherwise>
             <!-- chưa login -->
