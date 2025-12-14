@@ -47,22 +47,34 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Top Bar - Similar to Customer */
+/* Top Bar - Similar to Customer with Admin Colors */
 .admin-top-bar {
-    background: var(--header-bg);
-    color: var(--text-primary);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: #ffffff;
     padding: 12px 24px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border-bottom: none;
+    box-shadow: 0 2px 8px rgba(240, 147, 251, 0.3);
 }
 
-.admin-top-bar span:first-child {
+body[data-theme="dark"] .admin-top-bar {
+    background: linear-gradient(135deg, #434343 0%, #000000 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.admin-top-bar span {
     font-size: 20px;
     font-weight: 500;
     letter-spacing: -0.5px;
+    color: #ffffff;
+}
+
+.site-logo {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
 }
 
 /* Theme Toggle Button - Similar to Customer */
@@ -75,18 +87,19 @@ body {
 .admin-theme-toggle button { 
     padding: 8px 16px; 
     border-radius: 18px; 
-    border: 1px solid var(--border-color); 
-    background: var(--bg-hover); 
-    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
     cursor: pointer; 
     font-weight: 500;
     font-size: 14px;
     transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
 }
 
 .admin-theme-toggle button:hover { 
-    background: var(--bg-secondary);
-    border-color: var(--accent-color);
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 /* Navigation Menu - Similar to Customer */
@@ -569,4 +582,25 @@ body[data-theme="dark"] .admin-message.error {
         padding: 8px 16px;
         font-size: 13px;
     }
+}
+
+
+/* Language Switch in Admin Topbar */
+.lang-switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.lang-switch a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.lang-switch a:hover {
+    color: #ffffff;
 }

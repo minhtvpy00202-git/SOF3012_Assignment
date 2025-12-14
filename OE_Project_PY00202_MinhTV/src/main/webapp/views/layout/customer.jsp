@@ -18,15 +18,9 @@
 <fmt:setLocale value="${sessionScope.siteLang != null ? sessionScope.siteLang : 'vi'}" scope="request" />
 <fmt:setBundle basename="messages" scope="request" />
 
-<div class="top-bar">
-    <span><fmt:message key="app.title"/></span>
-    <div class="theme-toggle">
-        <button id="themeToggle" type="button">🌙 Dark</button>
-    </div>
-    <div class="lang-switch">
-        <a href="#" data-lang="en">EN</a> | <a href="#" data-lang="vi">VI</a>
-    </div>
-</div>
+<jsp:include page="topbar.jsp">
+    <jsp:param name="isAdmin" value="false" />
+</jsp:include>
 
 <div class="menu">
     <a href="${pageContext.request.contextPath}/home"><fmt:message key="menu.home"/></a>
@@ -61,7 +55,8 @@
                     <a href="${pageContext.request.contextPath}/account/registration"><fmt:message key="account.registration"/></a>
                 </div>
             </span>
-            <span class="right greet"><fmt:message key="greet.guest"/></span>
+            <span class="right greet"><fmt:message key="greet.guest"/><a style="color: white; background-color:red; margin-left: 10px;" href="${pageContext.request.contextPath}/login"><fmt:message key="account.login"/></a></span>
+
         </c:otherwise>
     </c:choose>
 </div>
@@ -84,6 +79,38 @@
     <!-- NỘI DUNG TỪ TRANG CON -->
     <jsp:include page="${view}" />
 </div>
+
+    <!-- Chatbot widget -->
+    <style>
+        .chatbot-toggle { position: fixed; right: 20px; bottom: 20px; z-index: 9999; padding: 10px 14px; border: none; border-radius: 20px; background: #cc0000; color: #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .chatbot-panel { position: fixed; right: 20px; bottom: 70px; width: 320px; max-height: 420px; background: #fff; color: #000; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 18px rgba(0,0,0,0.25); display: none; flex-direction: column; overflow: hidden; z-index: 9999; }
+        .chatbot-header { padding: 10px; background: #202020; color: #fff; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+        .chatbot-messages { padding: 10px; overflow-y: auto; flex: 1; background: #fafafa; }
+        .chatbot-input { display: flex; border-top: 1px solid #eee; }
+        .chatbot-input input { flex: 1; padding: 8px; border: none; outline: none; }
+        .chatbot-input button { padding: 8px 12px; border: none; background: #cc0000; color: #fff; cursor: pointer; }
+        .msg { margin: 6px 0; }
+        .msg.me { text-align: right; }
+        .msg.me span { display: inline-block; background: #e7f1ff; color: #003d99; padding: 6px 8px; border-radius: 12px; }
+        .msg.bot span { display: inline-block; background: #f2f2f2; color: #222; padding: 6px 8px; border-radius: 12px; }
+        [data-theme="dark"] .chatbot-panel { background: #1e1e1e; color: #ddd; border-color: #333; }
+        [data-theme="dark"] .chatbot-header { background: #111; }
+        [data-theme="dark"] .chatbot-messages { background: #151515; }
+        [data-theme="dark"] .msg.bot span { background: #222; color: #ddd; }
+        [data-theme="dark"] .msg.me span { background: #223; color: #cde; }
+    </style>
+    <button id="chatbotToggle" class="chatbot-toggle">Trợ lý</button>
+    <div id="chatbotPanel" class="chatbot-panel">
+        <div class="chatbot-header">
+            <span>Trợ lý OE</span>
+            <button id="chatbotClose" style="background:none;border:none;color:#fff;cursor:pointer">✕</button>
+        </div>
+        <div id="chatbotMessages" class="chatbot-messages"></div>
+        <form id="chatbotForm" class="chatbot-input">
+            <input id="chatbotInput" type="text" placeholder="Nhập câu hỏi..." autocomplete="off" />
+            <button type="submit">Gửi</button>
+        </form>
+    </div>
 
 </body>
 <script>
@@ -113,6 +140,55 @@
                 window.location.assign(url.toString());
             });
         }
+    })();
+
+    (function(){
+        var toggle = document.getElementById('chatbotToggle');
+        var panel = document.getElementById('chatbotPanel');
+        var closeBtn = document.getElementById('chatbotClose');
+        var form = document.getElementById('chatbotForm');
+        var input = document.getElementById('chatbotInput');
+        var messages = document.getElementById('chatbotMessages');
+
+        function addMsg(cls, text){
+            var div = document.createElement('div');
+            div.className = 'msg ' + cls;
+            var span = document.createElement('span');
+            span.textContent = text;
+            div.appendChild(span);
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function openPanel(){ panel.style.display = 'flex'; input.focus(); }
+        function closePanel(){ panel.style.display = 'none'; }
+
+        toggle.addEventListener('click', function(){
+            if(panel.style.display === 'flex') closePanel(); else openPanel();
+            if(messages.childElementCount === 0){
+                addMsg('bot', 'Chào bạn! Mình là trợ lý OE. Hãy hỏi về tìm video, yêu thích, đăng nhập/đăng ký, quên mật khẩu hoặc đổi giao diện.');
+            }
+        });
+        closeBtn.addEventListener('click', function(){ closePanel(); });
+
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            var text = (input.value || '').trim();
+            if(!text) return;
+            addMsg('me', text);
+            input.value = '';
+            fetch('${pageContext.request.contextPath}/chatbot', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+                body: new URLSearchParams({ message: text }).toString()
+            })
+            .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function(data){
+                addMsg('bot', (data.source ? '[' + data.source + '] ' : '') + data.reply);
+            })
+
+            .catch(function(){ addMsg('bot', 'Không thể gửi yêu cầu. Vui lòng thử lại sau.'); });
+        });
     })();
 </script>
 </html>

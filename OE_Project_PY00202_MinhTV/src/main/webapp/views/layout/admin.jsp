@@ -17,16 +17,10 @@
 <fmt:setLocale value="${sessionScope.siteLang != null ? sessionScope.siteLang : 'vi'}" scope="request" />
 <fmt:setBundle basename="messages" scope="request" />
 
-<!-- Top Bar - Similar to Customer -->
-<div class="admin-top-bar">
-    <span><fmt:message key="app.title"/> - Admin</span>
-    <div class="admin-theme-toggle">
-        <button id="adminThemeToggle" type="button">🌙 Dark</button>
-    </div>
-    <div class="lang-switch">
-        <a href="#" data-lang="en">EN</a> | <a href="#" data-lang="vi">VI</a>
-    </div>
-</div>
+<!-- Top Bar - Reusable Component -->
+<jsp:include page="topbar.jsp">
+    <jsp:param name="isAdmin" value="true" />
+</jsp:include>
 
 <!-- Menu Bar - Similar to Customer -->
 <div class="admin-menu">
