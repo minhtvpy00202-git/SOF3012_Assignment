@@ -6,6 +6,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon"
+          href="${pageContext.request.contextPath}/assets/images/favicon.ico">
+
     <title>OE - Administration</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/admin.css">
 </head>
@@ -28,6 +31,7 @@
     <a href="${pageContext.request.contextPath}/home"><fmt:message key="admin.menu.customerHome"/></a>
     <a href="${pageContext.request.contextPath}/admin/videos"><fmt:message key="admin.menu.videos"/></a>
     <a href="${pageContext.request.contextPath}/admin/users"><fmt:message key="admin.menu.users"/></a>
+    <a href="${pageContext.request.contextPath}/admin/messages"><fmt:message key="admin.menu.messages"/></a>
     <a href="${pageContext.request.contextPath}/admin/reports"><fmt:message key="admin.menu.reports"/></a>
     <a href="${pageContext.request.contextPath}/account/logoff"><fmt:message key="admin.menu.logoff"/></a>
 </div>
@@ -35,6 +39,7 @@
 <main>
     <jsp:include page="${view}" />
 </main>
+
 </body>
 <script>
     (function(){

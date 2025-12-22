@@ -5,11 +5,13 @@ import java.util.Date;
 
 import com.poly.oe.dao.CommentDao;
 import com.poly.oe.dao.CommentLikeDao;
+import com.poly.oe.dao.NotificationDAO;
 import com.poly.oe.dao.impl.CommentDaoImpl;
 import com.poly.oe.dao.impl.CommentLikeDaoImpl;
 import com.poly.oe.entity.Comment;
 import com.poly.oe.entity.CommentLike;
 import com.poly.oe.entity.CommentLikeId;
+import com.poly.oe.entity.Notification;
 import com.poly.oe.entity.User;
 
 import jakarta.servlet.ServletException;
@@ -33,6 +35,12 @@ public class CommentServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         User current = session != null ? (User) session.getAttribute("currentUser") : null;
         if (current == null) {
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"unauthorized\"}");
+                return;
+            }
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
@@ -52,7 +60,13 @@ public class CommentServlet extends HttpServlet {
         String videoId = req.getParameter("videoId");
         String content = req.getParameter("content");
         if (videoId == null || videoId.isBlank() || content == null || content.isBlank()) {
-            redirectBack(req, resp, videoId);
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"invalid_input\"}");
+            } else {
+                redirectBack(req, resp, videoId);
+            }
             return;
         }
         Comment c = new Comment();
@@ -64,8 +78,23 @@ public class CommentServlet extends HttpServlet {
         c.setLikeCount(0);
         c.setUpdateDate(null);
         c.setParent(null);
-        commentDao.create(c);
-        redirectBack(req, resp, videoId);
+        c = commentDao.create(c);
+        if (isAjax(req)) {
+            String name = current.getFullname() != null && !current.getFullname().isBlank()
+                    ? current.getFullname() : current.getId();
+            resp.setContentType("application/json");
+            StringBuilder sb = new StringBuilder();
+            sb.append("{")
+              .append("\"id\":").append(c.getId()).append(",")
+              .append("\"videoId\":\"").append(c.getVideoId()).append("\",")
+              .append("\"content\":\"").append(escape(c.getContent())).append("\",")
+              .append("\"userName\":\"").append(escape(name)).append("\",")
+              .append("\"likeCount\":").append(c.getLikeCount() == null ? 0 : c.getLikeCount())
+              .append("}");
+            resp.getWriter().write(sb.toString());
+        } else {
+            redirectBack(req, resp, videoId);
+        }
     }
 
     private void handleReply(HttpServletRequest req, HttpServletResponse resp, User current) throws IOException {
@@ -74,12 +103,24 @@ public class CommentServlet extends HttpServlet {
         Long parentId = null;
         try { parentId = Long.valueOf(parentIdStr); } catch (Exception ignored) {}
         if (parentId == null || content == null || content.isBlank()) {
-            redirectBack(req, resp, req.getParameter("videoId"));
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"invalid_input\"}");
+            } else {
+                redirectBack(req, resp, req.getParameter("videoId"));
+            }
             return;
         }
         Comment parent = commentDao.findById(parentId);
         if (parent == null) {
-            redirectBack(req, resp, req.getParameter("videoId"));
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"not_found\"}");
+            } else {
+                redirectBack(req, resp, req.getParameter("videoId"));
+            }
             return;
         }
         Comment c = new Comment();
@@ -92,7 +133,37 @@ public class CommentServlet extends HttpServlet {
         c.setUpdateDate(null);
         c.setParent(parent);
         commentDao.create(c);
-        redirectBack(req, resp, parent.getVideoId());
+
+        try {
+            if (parent.getUser() != null && parent.getUser().getId() != null
+                    && !parent.getUser().getId().equalsIgnoreCase(current.getId())) {
+                Notification noti = Notification.builder()
+                        .userId(parent.getUser().getId())
+                        .title("Bình luận mới 💬")
+                        .content("Có người đã trả lời bình luận của bạn.")
+                        .targetUrl(req.getContextPath() + "/video/detail?id=" + parent.getVideoId())
+                        .type("REPLY")
+                        .build();
+                new NotificationDAO().create(noti);
+            }
+        } catch (Exception ignored) {}
+
+        if (isAjax(req)) {
+            String name = current.getFullname() != null && !current.getFullname().isBlank()
+                    ? current.getFullname() : current.getId();
+            resp.setContentType("application/json");
+            StringBuilder sb = new StringBuilder();
+            sb.append("{")
+              .append("\"parentId\":").append(parent.getId()).append(",")
+              .append("\"videoId\":\"").append(parent.getVideoId()).append("\",")
+              .append("\"content\":\"").append(escape(c.getContent())).append("\",")
+              .append("\"userName\":\"").append(escape(name)).append("\",")
+              .append("\"likeCount\":0")
+              .append("}");
+            resp.getWriter().write(sb.toString());
+        } else {
+            redirectBack(req, resp, parent.getVideoId());
+        }
     }
 
     private void handleLike(HttpServletRequest req, HttpServletResponse resp, User current) throws IOException {
@@ -100,27 +171,53 @@ public class CommentServlet extends HttpServlet {
         Long commentId = null;
         try { commentId = Long.valueOf(commentIdStr); } catch (Exception ignored) {}
         if (commentId == null) {
-            redirectBack(req, resp, req.getParameter("videoId"));
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"invalid_input\"}");
+            } else {
+                redirectBack(req, resp, req.getParameter("videoId"));
+            }
             return;
         }
         Comment c = commentDao.findById(commentId);
         if (c == null) {
-            redirectBack(req, resp, req.getParameter("videoId"));
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"not_found\"}");
+            } else {
+                redirectBack(req, resp, req.getParameter("videoId"));
+            }
             return;
         }
         boolean exists = commentLikeDao.exists(current.getId(), commentId);
+        boolean likedNow;
         if (exists) {
             commentLikeDao.delete(new CommentLikeId(current.getId(), commentId));
+            likedNow = false;
         } else {
             CommentLike like = new CommentLike(current, c, true);
             commentLikeDao.create(like);
+            likedNow = true;
         }
 
         long cnt = commentLikeDao.countLikes(commentId);
         c.setLikeCount((int) cnt);
         c.setUpdateDate(new Date());
         commentDao.update(c);
-        redirectBack(req, resp, c.getVideoId());
+        if (isAjax(req)) {
+            resp.setContentType("application/json");
+            StringBuilder sb = new StringBuilder();
+            sb.append("{")
+              .append("\"commentId\":").append(commentId).append(",")
+              .append("\"liked\":").append(likedNow).append(",")
+              .append("\"likeCount\":").append(cnt)
+              .append("}");
+            resp.getWriter().write(sb.toString());
+        } else {
+            redirectBack(req, resp, c.getVideoId());
+        }
     }
 
     private void redirectBack(HttpServletRequest req, HttpServletResponse resp, String videoId) throws IOException {
@@ -129,5 +226,16 @@ public class CommentServlet extends HttpServlet {
             referer = req.getContextPath() + "/video/detail?id=" + (videoId != null ? videoId : "");
         }
         resp.sendRedirect(referer);
+    }
+
+    private boolean isAjax(HttpServletRequest req) {
+        String acc = req.getHeader("Accept");
+        String xr = req.getHeader("X-Requested-With");
+        return (acc != null && acc.contains("application/json")) || (xr != null && !xr.isBlank());
+    }
+
+    private static String escape(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r");
     }
 }

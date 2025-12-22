@@ -10,10 +10,10 @@ public class JpaUtils {
 
     static {
         try {
-            // TÊN NÀY PHẢI GIỐNG y chang trong persistence.xml
+
             factory = Persistence.createEntityManagerFactory("OE_AssignmentPU");
         } catch (Exception e) {
-            e.printStackTrace();      // rất quan trọng để biết lỗi cấu hình
+            e.printStackTrace();
         }
     }
 

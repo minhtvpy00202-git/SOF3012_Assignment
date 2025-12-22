@@ -34,6 +34,12 @@ public class VideoUnlikeServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         User user = session != null ? (User) session.getAttribute("currentUser") : null;
         if (user == null) {
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"unauthorized\"}");
+                return;
+            }
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
@@ -46,10 +52,21 @@ public class VideoUnlikeServlet extends HttpServlet {
             favoriteDao.removeByUserAndVideo(user.getId(), videoId);
         }
 
-        String referer = req.getHeader("referer");
-        if (referer == null) {
-            referer = req.getContextPath() + "/my-favorites";
+        if (isAjax(req)) {
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"videoId\":\"" + (videoId != null ? videoId : "") + "\",\"liked\":false}");
+        } else {
+            String referer = req.getHeader("referer");
+            if (referer == null) {
+                referer = req.getContextPath() + "/my-favorites";
+            }
+            resp.sendRedirect(referer);
         }
-        resp.sendRedirect(referer);
+    }
+
+    private boolean isAjax(HttpServletRequest req) {
+        String acc = req.getHeader("Accept");
+        String xr = req.getHeader("X-Requested-With");
+        return (acc != null && acc.contains("application/json")) || (xr != null && !xr.isBlank());
     }
 }

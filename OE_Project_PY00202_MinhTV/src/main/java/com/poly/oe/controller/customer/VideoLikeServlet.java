@@ -40,6 +40,12 @@ public class VideoLikeServlet extends HttpServlet {
         HttpSession session = req.getSession(false);
         User user = session != null ? (User) session.getAttribute("currentUser") : null;
         if (user == null) {
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"unauthorized\"}");
+                return;
+            }
             resp.sendRedirect(req.getContextPath() + "/login");
             return;
         }
@@ -49,13 +55,25 @@ public class VideoLikeServlet extends HttpServlet {
             videoId = req.getParameter("id");
         }
         if (videoId == null || videoId.isBlank()) {
-            resp.sendRedirect(req.getContextPath() + "/home");
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"invalid_input\"}");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/home");
+            }
             return;
         }
 
         Video video = videoDao.findById(videoId);
         if (video == null) {
-            resp.sendRedirect(req.getContextPath() + "/home");
+            if (isAjax(req)) {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setContentType("application/json");
+                resp.getWriter().write("{\"error\":\"not_found\"}");
+            } else {
+                resp.sendRedirect(req.getContextPath() + "/home");
+            }
             return;
         }
 
@@ -68,10 +86,21 @@ public class VideoLikeServlet extends HttpServlet {
             favoriteDao.create(f);
         }
 
-        String referer = req.getHeader("referer");
-        if (referer == null) {
-            referer = req.getContextPath() + "/home";
+        if (isAjax(req)) {
+            resp.setContentType("application/json");
+            resp.getWriter().write("{\"videoId\":\"" + videoId + "\",\"liked\":true}");
+        } else {
+            String referer = req.getHeader("referer");
+            if (referer == null) {
+                referer = req.getContextPath() + "/home";
+            }
+            resp.sendRedirect(referer);
         }
-        resp.sendRedirect(referer);
+    }
+
+    private boolean isAjax(HttpServletRequest req) {
+        String acc = req.getHeader("Accept");
+        String xr = req.getHeader("X-Requested-With");
+        return (acc != null && acc.contains("application/json")) || (xr != null && !xr.isBlank());
     }
 }

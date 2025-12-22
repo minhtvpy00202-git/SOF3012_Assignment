@@ -3,8 +3,10 @@ package com.poly.oe.controller.admin;
 import java.io.IOException;
 import java.util.List;
 
+import com.poly.oe.dao.NotificationDAO;
 import com.poly.oe.dao.UserDao;
 import com.poly.oe.dao.impl.UserDaoImpl;
+import com.poly.oe.entity.Notification;
 import com.poly.oe.entity.User;
 
 import jakarta.servlet.ServletException;
@@ -93,6 +95,7 @@ public class AdminUserServlet extends HttpServlet {
                     throw new RuntimeException("Không tìm thấy người dùng: " + id);
                 }
 
+                boolean oldActive = u.isActive();
                 u.setPassword(req.getParameter("password"));
                 u.setFullname(req.getParameter("fullname"));
                 u.setEmail(req.getParameter("email"));
@@ -105,6 +108,20 @@ public class AdminUserServlet extends HttpServlet {
                 // vẫn ở trạng thái edit user này
                 prepareEditForm(req, id);
 
+                try {
+                    if (oldActive != u.isActive()) {
+                        String content = u.isActive() ? "Tài khoản của bạn đã được mở khóa." : "Tài khoản của bạn đã bị khóa.";
+                        Notification noti = Notification.builder()
+                                .userId(u.getId())
+                                .title("Thông báo từ quản trị")
+                                .content(content)
+                                .type("ADMIN")
+                                .targetUrl(req.getContextPath() + "/account/edit-profile")
+                                .build();
+                        new NotificationDAO().create(noti);
+                    }
+                } catch (Exception ignored) {}
+
             } else if ("delete".equals(action)) {
                 // ===== XÓA USER =====
                 String id = req.getParameter("id");
@@ -112,11 +129,18 @@ public class AdminUserServlet extends HttpServlet {
                     throw new RuntimeException("Chưa chọn người dùng để xóa");
                 }
 
-                userDao.remove(id);
-                req.setAttribute("message", "Đã xóa người dùng: " + id);
+                jakarta.servlet.http.HttpSession session = req.getSession(false);
+                com.poly.oe.entity.User current = (session != null) ? (com.poly.oe.entity.User) session.getAttribute("currentUser") : null;
+                if (current != null && id.equalsIgnoreCase(current.getId())) {
+                    req.setAttribute("deleteSelfNotAllowed", true);
+                    prepareEditForm(req, id);
+                } else {
+                    userDao.remove(id);
+                    req.setAttribute("message", "Đã xóa người dùng: " + id);
 
-                // quay về trạng thái khởi đầu
-                prepareInitialForm(req);
+                    // quay về trạng thái khởi đầu
+                    prepareInitialForm(req);
+                }
 
             } else if ("reset".equals(action)) {
                 // ===== RESET FORM =====
@@ -135,6 +159,17 @@ public class AdminUserServlet extends HttpServlet {
                 userDao.update(u);
                 req.setAttribute("message", "Đã duyệt tài khoản: " + id);
                 prepareInitialForm(req);
+
+                try {
+                    Notification noti = Notification.builder()
+                            .userId(u.getId())
+                            .title("Thông báo từ quản trị")
+                            .content("Tài khoản của bạn đã được duyệt.")
+                            .type("ADMIN")
+                            .targetUrl(req.getContextPath() + "/home")
+                            .build();
+                    new NotificationDAO().create(noti);
+                } catch (Exception ignored) {}
             } else if ("restore".equals(action)) {
                 String[] ids = req.getParameterValues("ids");
                 java.util.List<String> list = new java.util.ArrayList<>();

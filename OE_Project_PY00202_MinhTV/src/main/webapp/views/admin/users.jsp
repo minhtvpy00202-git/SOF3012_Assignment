@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
 
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 
@@ -185,6 +186,13 @@
         </c:if>
         <c:if test="${not empty error}">
             <div class="admin-message error">${error}</div>
+        </c:if>
+        <c:if test="${deleteSelfNotAllowed}">
+            <script>
+                (function(){
+                    alert("<fmt:message key='admin.users.deleteSelfNotAllowed'/>");
+                })();
+            </script>
         </c:if>
 
         <!-- TAB 1: USER EDITION -->

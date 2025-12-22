@@ -2,11 +2,17 @@
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
 <%@ taglib prefix="fmt" uri="jakarta.tags.fmt" %>
+<%@ page import="com.poly.oe.dao.NotificationDAO" %>
+<%@ page import="com.poly.oe.dao.UserMessageDAO" %>
+<%@ page import="com.poly.oe.entity.User" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon"
+          href="${pageContext.request.contextPath}/assets/images/favicon.ico">
+
     <title>OE Online Entertainment</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/youtube-style.css">
 </head>
@@ -17,6 +23,9 @@
     </c:if>
 <fmt:setLocale value="${sessionScope.siteLang != null ? sessionScope.siteLang : 'vi'}" scope="request" />
 <fmt:setBundle basename="messages" scope="request" />
+<fmt:message key="notifications.empty" var="notifEmpty"/>
+<fmt:message key="action.like" var="likeText"/>
+<fmt:message key="action.unlike" var="unlikeText"/>
 
 <jsp:include page="topbar.jsp">
     <jsp:param name="isAdmin" value="false" />
@@ -25,6 +34,7 @@
 <div class="menu">
     <a href="${pageContext.request.contextPath}/home"><fmt:message key="menu.home"/></a>
     <a href="${pageContext.request.contextPath}/my-favorites"><fmt:message key="menu.favorites"/></a>
+    <a href="${pageContext.request.contextPath}/watched-videos"><fmt:message key="menu.watched"/></a>
 
     
 
@@ -40,10 +50,47 @@
                 <div class="dropdown-menu">
                     <a href="${pageContext.request.contextPath}/account/edit-profile"><fmt:message key="account.editProfile"/></a>
                     <a href="${pageContext.request.contextPath}/account/change-password"><fmt:message key="account.changePassword"/></a>
+                    <a href="${pageContext.request.contextPath}/inbox"><fmt:message key="menu.inbox"/></a>
                     <a href="${pageContext.request.contextPath}/account/logoff"><fmt:message key="account.logoff"/></a>
                 </div>
             </span>
-            <span class="right greet"><fmt:message key="greet.loggedInPrefix"/> <b style="color: red;"> ${sessionScope.currentUser.fullname != null && sessionScope.currentUser.fullname != '' ? sessionScope.currentUser.fullname : sessionScope.currentUser.id} </b></span>
+            <span class="right greet">
+                <%
+                    User cu = (User) (session != null ? session.getAttribute("currentUser") : null);
+                    long unreadNoti = 0;
+                    long unreadMsg = 0;
+                    if (cu != null) {
+                        try { unreadNoti = new NotificationDAO().countUnread(cu.getId()); } catch (Exception ignored) {}
+                        try { unreadMsg = new UserMessageDAO().countUnread(cu.getId()); } catch (Exception ignored) {}
+                    }
+                    long unreadTotal = unreadNoti + unreadMsg;
+                %>
+                <div id="bellWrap" style="position: relative; display:inline-block; margin-right:10px;">
+                    <button id="bellBtn" type="button" style="background:none;border:none;cursor:pointer;position:relative;">
+                        <span style="font-size: 20px;">🔔</span>
+                        <% if (unreadTotal > 0) { %>
+                        <span id="bellBadge" style="position:absolute; top:-6px; right:-10px; background:red; color:#fff; border-radius:10px; padding:0 6px; font-size:12px;">
+                            <%= unreadTotal %>
+                        </span>
+                        <% } else { %>
+                        <span id="bellBadge" style="position:absolute; top:-6px; right:-10px; background:red; color:#fff; border-radius:10px; padding:0 6px; font-size:12px; display:none;">
+                            <%= unreadTotal %>
+                        </span>
+                        <% } %>
+                    </button>
+                    <div id="bellDropdown" style="display:none; position:absolute; right:0; top:28px; width:360px; max-height:480px; overflow:auto; background:#fff; color:#000; border:1px solid #ddd; border-radius:8px; box-shadow:0 8px 28px rgba(0,0,0,.25); z-index:9999;">
+                        <div style="padding:10px; border-bottom:1px solid #eee; font-weight:600;">
+                            <fmt:message key="notifications.title"/>
+                        </div>
+                        <div id="bellList" style="padding:8px;"></div>
+                        <div style="padding:8px; border-top:1px solid #eee; text-align:right;">
+                            <a href="${pageContext.request.contextPath}/notifications" style="text-decoration:none;">Xem tất cả</a>
+                        </div>
+                    </div>
+                </div>
+                <fmt:message key="greet.loggedInPrefix"/> <b style="color: red;"> ${sessionScope.currentUser.fullname != null && sessionScope.currentUser.fullname != '' ? sessionScope.currentUser.fullname : sessionScope.currentUser.id} </b>
+                <a href="${pageContext.request.contextPath}/account/logoff" style="color: white; background-color:red; margin-left: 10px; padding: 6px 10px; border-radius:6px;"><fmt:message key="account.logoff"/></a>
+            </span>
         </c:when>
         <c:otherwise>
             <!-- chưa login -->
@@ -83,7 +130,7 @@
     <!-- Chatbot widget -->
     <style>
         .chatbot-toggle { position: fixed; right: 20px; bottom: 20px; z-index: 9999; padding: 10px 14px; border: none; border-radius: 20px; background: #cc0000; color: #fff; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-        .chatbot-panel { position: fixed; right: 20px; bottom: 70px; width: 320px; max-height: 420px; background: #fff; color: #000; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 18px rgba(0,0,0,0.25); display: none; flex-direction: column; overflow: hidden; z-index: 9999; }
+        .chatbot-panel { position: fixed; right: 20px; bottom: 70px; width: 320px; max-height: 430px; height:430px; background: #fff; color: #000; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 18px rgba(0,0,0,0.25); display: none; flex-direction: column; overflow: hidden; z-index: 9999; }
         .chatbot-header { padding: 10px; background: #202020; color: #fff; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
         .chatbot-messages { padding: 10px; overflow-y: auto; flex: 1; background: #fafafa; }
         .chatbot-input { display: flex; border-top: 1px solid #eee; }
@@ -143,7 +190,65 @@
     })();
 
     (function(){
-        var toggle = document.getElementById('chatbotToggle');
+        var btn = document.getElementById('bellBtn');
+        var dd = document.getElementById('bellDropdown');
+        var badge = document.getElementById('bellBadge');
+        var list = document.getElementById('bellList');
+        function toggleBell(){
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+        }
+        function close(e){
+            if(dd && btn && !dd.contains(e.target) && !btn.contains(e.target)){
+                dd.style.display = 'none';
+            }
+        }
+        function itemHtml(it){
+            var title = (it.title || '');
+            var content = (it.content || '');
+            var readDot = it.isRead ? '' : '<span style=\"display:inline-block;width:8px;height:8px;background:#1a73e8;border-radius:50%;margin-right:6px;\"></span>';
+            var url = it.targetUrl || '';
+            return '<div style=\"display:flex;gap:8px;padding:8px;border-bottom:1px solid #f0f0f0;\">'
+                 +   '<div style=\"flex:1;\">'
+                 +     '<div style=\"display:flex;align-items:center;\">'+ readDot + '<a href=\"'+ url +'\" style=\"color:#000;text-decoration:none;\">'+ title +'</a></div>'
+                 +     '<div style=\"font-size:12px;color:#666;margin-top:4px;\">'+ content +'</div>'
+                 +   '</div>'
+                 + '</div>';
+        }
+        function load(){
+            fetch('${pageContext.request.contextPath}/notifications-feed', { method: 'GET' })
+            .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+            .then(function(data){
+                if(!list) return;
+                list.innerHTML = '';
+                if(!data.items || data.items.length === 0){
+                    list.innerHTML = '<div style=\"padding:12px;color:#666;\">' + '${notifEmpty}' + '</div>';
+                }else{
+                    data.items.forEach(function(it){ list.insertAdjacentHTML('beforeend', itemHtml(it)); });
+                }
+                fetch('${pageContext.request.contextPath}/notifications-feed/mark-all', { method: 'POST' }).catch(function(){});
+                if(badge){
+                    badge.style.display = 'none';
+                    badge.textContent = '';
+                }
+            }).catch(function(){
+                if(list){
+                    list.innerHTML = '<div style=\"padding:12px;color:#c00;\">Không tải được thông báo.</div>';
+                }
+            });
+        }
+        if(btn){
+            btn.addEventListener('click', function(evt){
+                if(evt && evt.stopPropagation) evt.stopPropagation();
+                toggleBell();
+                if(dd.style.display === 'block'){
+                    load();
+                }
+            });
+            document.addEventListener('click', close);
+            if(dd){ dd.addEventListener('click', function(e){ if(e && e.stopPropagation) e.stopPropagation(); }); }
+        }
+
+        var chatbotToggle = document.getElementById('chatbotToggle');
         var panel = document.getElementById('chatbotPanel');
         var closeBtn = document.getElementById('chatbotClose');
         var form = document.getElementById('chatbotForm');
@@ -163,10 +268,10 @@
         function openPanel(){ panel.style.display = 'flex'; input.focus(); }
         function closePanel(){ panel.style.display = 'none'; }
 
-        toggle.addEventListener('click', function(){
+        chatbotToggle.addEventListener('click', function(){
             if(panel.style.display === 'flex') closePanel(); else openPanel();
             if(messages.childElementCount === 0){
-                addMsg('bot', 'Chào bạn! Mình là trợ lý OE. Hãy hỏi về tìm video, yêu thích, đăng nhập/đăng ký, quên mật khẩu hoặc đổi giao diện.');
+                addMsg('bot', 'Chào bạn! Mình là trợ lý OE. Mình có thể giúp bạn giải đáp thắc mắc về trang web này. Ngoài ra mình còn có thể trò chuyện vui vẻ cùng bạn nữa!');
             }
         });
         closeBtn.addEventListener('click', function(){ closePanel(); });
@@ -184,10 +289,36 @@
             })
             .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
             .then(function(data){
-                addMsg('bot', (data.source ? '[' + data.source + '] ' : '') + data.reply);
+                addMsg('bot', data.reply);
             })
 
+
             .catch(function(){ addMsg('bot', 'Không thể gửi yêu cầu. Vui lòng thử lại sau.'); });
+        });
+    })();
+    (function(){
+        document.addEventListener('submit', function(e){
+            var form = e.target;
+            if(!form || !form.getAttribute) return;
+            var action = form.getAttribute('action') || '';
+            var method = (form.getAttribute('method') || 'get').toLowerCase();
+            if(method === 'post' && (action.endsWith('/video/like') || action.endsWith('/video/unlike'))){
+                e.preventDefault();
+                var fd = new URLSearchParams(new FormData(form));
+                fetch(action, { method: 'POST', headers: { 'Accept': 'application/json', 'X-Requested-With': 'fetch' }, body: fd })
+                    .then(function(r){ return r.ok ? r.json() : Promise.reject(r.status); })
+                    .then(function(data){
+                        var btn = form.querySelector('button');
+                        if(!btn) return;
+                        if(data.liked){
+                            form.setAttribute('action', '${pageContext.request.contextPath}/video/unlike');
+                            btn.textContent = '${unlikeText}';
+                        } else {
+                            form.setAttribute('action', '${pageContext.request.contextPath}/video/like');
+                            btn.textContent = '${likeText}';
+                        }
+                    });
+            }
         });
     })();
 </script>

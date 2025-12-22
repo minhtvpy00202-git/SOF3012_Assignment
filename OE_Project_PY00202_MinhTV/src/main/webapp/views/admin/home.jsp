@@ -25,6 +25,8 @@
            href="${pageContext.request.contextPath}/admin/users"><fmt:message key="admin.shortcuts.users"/></a>
         <a class="btn btn-primary"
            href="${pageContext.request.contextPath}/admin/reports"><fmt:message key="admin.shortcuts.reports"/></a>
+        <a class="btn btn-primary"
+           href="${pageContext.request.contextPath}/admin/messages"><fmt:message key="admin.menu.messages"/></a>
     </div>
 
     <!-- Bảng vài video mới nhất / nhiều view -->

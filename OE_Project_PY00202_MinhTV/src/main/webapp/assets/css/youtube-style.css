@@ -542,12 +542,10 @@ body[data-theme="dark"] .top-bar {
 }
 
 /* ========================================
-   COMMENTS SECTION
+   COMMENTS SECTION - YouTube Style
    ======================================== */
 .comment-form {
-    padding: 20px;
-    background: var(--comment-bg);
-    border-radius: 8px;
+    padding: 20px 0;
     margin-top: 16px;
     width: 100%;
 }
@@ -572,22 +570,21 @@ body[data-theme="dark"] .top-bar {
 }
 
 .comment-item {
-    padding: 20px;
-    border-top: 1px solid var(--border-color);
+    padding: 16px 0;
     width: 100%;
 }
 
 .comment-author {
-    font-weight: 500;
+    font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .comment-content {
     color: var(--text-primary);
     line-height: 1.6;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     font-size: 14px;
     word-wrap: break-word;
 }
@@ -595,18 +592,69 @@ body[data-theme="dark"] .top-bar {
 .comment-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
     font-size: 13px;
     color: var(--text-secondary);
 }
 
-.comment-reply {
-    margin-left: 48px;
-    padding: 16px;
-    border-left: 2px solid var(--border-color);
-    margin-top: 12px;
+.like-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.like-count {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.comment-actions .btn-like {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 18px;
+    transition: background 0.2s ease;
+}
+
+.comment-actions .btn-like:hover {
     background: var(--bg-hover);
-    border-radius: 0 8px 8px 0;
+}
+
+.reply-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 18px;
+    transition: background 0.2s ease;
+}
+
+.reply-btn:hover {
+    background: var(--bg-hover);
+}
+
+.comment-reply {
+    margin-left: 40px;
+    padding: 12px 0;
+    margin-top: 8px;
+}
+
+.reply-form {
+    margin-left: 40px;
+    margin-top: 8px;
+    display: none;
+}
+
+.reply-form.active {
+    display: block;
 }
 
 /* Replies toggle */
@@ -835,4 +883,36 @@ select:disabled {
 
 .lang-switch a:hover {
     color: #ffffff;
+}
+
+/* Override any remaining button backgrounds in comments */
+.comment-item button,
+.comment-reply button {
+    background: none !important;
+    border: none !important;
+    color: var(--text-secondary) !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    padding: 4px 8px !important;
+    border-radius: 18px !important;
+    transition: background 0.2s ease !important;
+}
+
+.comment-item button:hover,
+.comment-reply button:hover {
+    background: var(--bg-hover) !important;
+}
+
+/* Special styling for submit buttons in reply forms */
+.reply-form button[type="submit"] {
+    color: var(--accent-color) !important;
+    font-weight: 500 !important;
+}
+
+/* Remove any remaining backgrounds from comment sections */
+.comment-item,
+.comment-reply {
+    background: transparent !important;
+    border: none !important;
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.poly.oe.dao.UserDao;
 import com.poly.oe.dao.impl.UserDaoImpl;
 import com.poly.oe.entity.User;
+import com.poly.oe.utils.MailUtils;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -36,10 +37,20 @@ public class ForgotPasswordServlet extends HttpServlet {
         String message;
         try {
             User u = userDao.findById(username);
-            if (u == null || u.getEmail() == null || !u.getEmail().equalsIgnoreCase(email)) {
-                message = "Thông tin không chính xác!";
+            if (u == null) {
+                message = "Tài khoản không tồn tại!";
+            } else if (u.getEmail() == null || !u.getEmail().equalsIgnoreCase(email)) {
+                message = "Email không khớp với tài khoản!";
             } else {
-                message = "Mật khẩu đã được gửi vào email của bạn (demo).";
+                String subject = "Khôi phục mật khẩu - OE Project";
+                String content = "<h3>Xin chào " + u.getFullname() + ",</h3>"
+                               + "<p>Bạn vừa yêu cầu lấy lại mật khẩu tại hệ thống OE Project.</p>"
+                               + "<p>Mật khẩu của bạn là: <b style='color:red; font-size:1.2em'>" + u.getPassword() + "</b></p>"
+                               + "<p>Vui lòng đăng nhập và đổi mật khẩu để bảo mật tài khoản.</p>"
+                               + "<p>Trân trọng,<br>Admin Team</p>";
+                
+                MailUtils.sendHtmlMail(email, subject, content);
+                message = "Mật khẩu đã được gửi đến email: " + email;
             }
         } catch (Exception e) {
             e.printStackTrace();

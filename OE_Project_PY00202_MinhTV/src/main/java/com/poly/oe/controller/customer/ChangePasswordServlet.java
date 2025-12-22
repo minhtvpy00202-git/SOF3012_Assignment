@@ -2,6 +2,8 @@ package com.poly.oe.controller.customer;
 
 import com.poly.oe.dao.UserDao;
 import com.poly.oe.dao.impl.UserDaoImpl;
+import com.poly.oe.dao.NotificationDAO;
+import com.poly.oe.entity.Notification;
 import com.poly.oe.entity.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -50,6 +52,17 @@ public class ChangePasswordServlet extends HttpServlet {
                 userDao.update(current);
                 session.setAttribute("currentUser", current);
                 message = "Đổi mật khẩu thành công.";
+
+                try {
+                    Notification noti = Notification.builder()
+                            .userId(current.getId())
+                            .title("Bảo mật tài khoản 🔐")
+                            .content("Mật khẩu của bạn đã được thay đổi thành công.")
+                            .type("SYSTEM")
+                            .targetUrl(req.getContextPath() + "/account/change-password")
+                            .build();
+                    new NotificationDAO().create(noti);
+                } catch (Exception ignored) {}
             }
         } catch (Exception e) {
             e.printStackTrace();
